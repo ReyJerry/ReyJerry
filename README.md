@@ -22,8 +22,6 @@
 
 <p><img align="left" src="https://github-readme-stats.vercel.app/api/top-langs?username=ReyJerry&show_icons=true&locale=en&layout=compact" alt="ReyJerry" /></p>
 
-<p>&nbsp;<img align="center" src="https://github-readme-stats.vercel.app/api?username=ReyJerry&show_icons=true&locale=en" alt="ReyJerry" /></p>
-
 ## 📊 My Contribution Stats
 
 <!--STATS:START-->
