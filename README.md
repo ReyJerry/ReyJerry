@@ -2,8 +2,6 @@
 
 ### A passionate Natural Language Architecture researcher
 
-<p align="left"> <img src="https://komarev.com/ghpvc/?username=ReyJerry&label=Profile views&color=0e75b6&style=flat" alt="ReyJerry" /> </p>
-
 <p align="left"> <a href="https://github.com/ryo-ma/github-profile-trophy"><img src="https://github-profile-trophy.vercel.app/?username=ReyJerry" alt="ReyJerry" /></a> </p>
 
 - 🌱 I'm currently learning **Natural Language Architecture, Multimodal, and Graph Learning**
