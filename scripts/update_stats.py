@@ -19,7 +19,7 @@ def gql(query, variables=None):
         raise RuntimeError(data["errors"])
     return data["data"]
 
-# 1) own public repos: list + total stars (sorted by stars -> forks)
+# ---------- Own public repos (non-fork): list + total stars ----------
 def get_own_public_repos_and_total_stars():
     repos, total = [], 0
     cursor = None
@@ -47,10 +47,11 @@ def get_own_public_repos_and_total_stars():
             cursor = page["pageInfo"]["endCursor"]
         else:
             break
+    # sort: stars desc -> forks desc
     repos.sort(key=lambda x: (-x["stars"], -x["forks"]))
     return repos, total
 
-# 2) contribution years
+# ---------- Contribution years ----------
 def get_years():
     q = """
     query($login:String!){
@@ -65,7 +66,7 @@ def get_years():
         years.append(y)
     return years
 
-# 3) per-year contributions aggregated by repo
+# ---------- Per-year contributions aggregated by repo ----------
 def collect_by_year(year):
     start = datetime.datetime(year, 1, 1)
     end = datetime.datetime(year + 1, 1, 1) - relativedelta(seconds=1)
@@ -99,6 +100,7 @@ def collect_by_year(year):
             "commit": 0, "pr": 0, "issue": 0
         })
         repo_map[k][key] += n
+        # keep latest meta
         repo_map[k]["stars"] = repo["stargazerCount"]
         repo_map[k]["forks"] = repo["forkCount"]
         repo_map[k]["url"] = repo["url"]
@@ -112,7 +114,7 @@ def collect_by_year(year):
 
     return repo_map
 
-# 4) all-time merge + split into mine / others; sort by stars -> forks
+# ---------- All-time merge + split mine/others; sort by stars->forks ----------
 def aggregate_contributions_all_time():
     years = get_years()
     merged = {}
@@ -146,34 +148,38 @@ def aggregate_contributions_all_time():
 
     return {"mine": mine, "others": others, "count_total": len(mine) + len(others)}
 
-# 5) pretty rendering
+# ---------- Pretty rendering (compact, elegant) ----------
 def render_markdown(own_repos, total_stars, contrib):
+    def fmt(n): return f"{n:,}"  # thousands separator
+
     def repo_badge(r):
-        # repo link + inline stars/forks badges
-        return f'<a href="{r["url"]}">{r["name"]}</a> <sub>· ⭐ {r["stars"]} · 🍴 {r["forks"]}</sub>'
+        # repo link + inline badges; add 1k+ mark
+        crown = ' <sup>🏆 1k+</sup>' if r["stars"] >= 1000 else ''
+        return f'<a href="{r["url"]}">{r["name"]}</a>{crown} <sub>· ⭐ {fmt(r["stars"])} · 🍴 {fmt(r["forks"])}</sub>'
+
+    def pill(n):  # use <kbd> for subtle pill look
+        return f"<kbd>{fmt(n)}</kbd>"
 
     def tbl(rows):
         if not rows:
             return "_(empty)_"
         header = (
             "| Repository | 📝 Commits | 🔀 PRs | 🐛 Issues | ∑ Total |\n"
-            "|---|---:|---:|---:|---:|"
+            "|:--|--:|--:|--:|--:|"
         )
         lines = [
-            f'| {repo_badge(r)} | {r["commit"]} | {r["pr"]} | {r["issue"]} | **{r["total"]}** |'
+            f'| {repo_badge(r)} | {pill(r["commit"])} | {pill(r["pr"])} | {pill(r["issue"])} | <b>{pill(r["total"])}</b> |'
             for r in rows
         ]
         return "\n".join([header] + lines)
 
     def list_stars(rows):
-        if not rows:
-            return "_(empty)_"
-        # bullet list for a cleaner look
+        if not rows: return "_(empty)_"
         return "\n".join([f'- {repo_badge(r)}' for r in rows])
 
     stars_block = f"""
 <details>
-  <summary><b>⭐ Total Stars Earned:</b> <code>{total_stars}</code></summary>
+  <summary><b>⭐ Total Stars Earned:</b> <code>{fmt(total_stars)}</code></summary>
 
   <br/>
 {list_stars(own_repos)}
@@ -183,7 +189,7 @@ def render_markdown(own_repos, total_stars, contrib):
 
     contrib_block = f"""
 <details>
-  <summary><b>🤝 Contributed to:</b> <code>{contrib["count_total"]}</code></summary>
+  <summary><b>🤝 Contributed to:</b> <code>{fmt(contrib["count_total"])}</code></summary>
 
   <br/>
   <div><b>👥 Other Repos</b></div>
