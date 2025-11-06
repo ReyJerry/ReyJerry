@@ -28,13 +28,12 @@
 
   <br/>
 - <a href="https://github.com/ReyJerry/HydraNet">Hydranet</a> <sub>· ⭐ 1 · 🍴 0</sub>
-- <a href="https://github.com/ReyJerry/skills-introduction-to-github">Skills Introduction To Github</a> <sub>· ⭐ 0 · 🍴 0</sub>
 - <a href="https://github.com/ReyJerry/ReyJerry.github.io">Reyjerry.github.io</a> <sub>· ⭐ 0 · 🍴 0</sub>
 - <a href="https://github.com/ReyJerry/ReyJerry">Reyjerry</a> <sub>· ⭐ 0 · 🍴 0</sub>
 </details>
 
 <details>
-  <summary><b>🤝 Contributed to:</b> <code>5</code></summary>
+  <summary><b>🤝 Contributed to:</b> <code>4</code></summary>
 
   <br/>
   <div><b>👥 Other Repos</b></div>
@@ -49,7 +48,6 @@
 | Repository | 📝 Commits | 🔀 PRs | 🐛 Issues | ∑ Total |
 |:--|--:|--:|--:|--:|
 | <a href="https://github.com/ReyJerry/HydraNet">Hydranet</a> <sub>· ⭐ 1 · 🍴 0</sub> | `11` | `0` | `0` | **`11`** |
-| <a href="https://github.com/ReyJerry/skills-introduction-to-github">Skills Introduction To Github</a> <sub>· ⭐ 0 · 🍴 0</sub> | `3` | `1` | `0` | **`4`** |
 | <a href="https://github.com/ReyJerry/ReyJerry.github.io">Reyjerry.github.io</a> <sub>· ⭐ 0 · 🍴 0</sub> | `426` | `0` | `0` | **`426`** |
 | <a href="https://github.com/ReyJerry/ReyJerry">Reyjerry</a> <sub>· ⭐ 0 · 🍴 0</sub> | `14` | `0` | `0` | **`14`** |
 
