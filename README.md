@@ -42,7 +42,7 @@
 
 | Repository | 📝 Commits | 🔀 PRs | 🐛 Issues | ∑ Total |
 |:--|--:|--:|--:|--:|
-| <a href="https://github.com/fla-org/flash-linear-attention">fla-org/flash-linear-attention</a> <sup>🏆 1k+</sup> <sub>· ⭐ 3,751 · 🍴 292</sub> | <kbd>1</kbd> | <kbd>2</kbd> | <kbd>1</kbd> | <b><kbd>4</kbd></b> |
+| <a href="https://github.com/fla-org/flash-linear-attention">fla-org/flash-linear-attention</a> <sup>🏆 1k+</sup> <sub>· ⭐ 3,752 · 🍴 292</sub> | <kbd>1</kbd> | <kbd>2</kbd> | <kbd>1</kbd> | <b><kbd>4</kbd></b> |
 
   <br/><br/>
   <div><b>📦 My Repos</b></div>
