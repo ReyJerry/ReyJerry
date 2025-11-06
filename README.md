@@ -1,6 +1,6 @@
 # Hi 👋, I'm ReyJerry
 
-### A passionate Scss developer
+### A passionate Natural Language Architecture researcher
 
 <p align="left"> <img src="https://komarev.com/ghpvc/?username=ReyJerry&label=Profile views&color=0e75b6&style=flat" alt="ReyJerry" /> </p>
 
@@ -24,11 +24,8 @@
 
 <p>&nbsp;<img align="center" src="https://github-readme-stats.vercel.app/api?username=ReyJerry&show_icons=true&locale=en" alt="ReyJerry" /></p>
 
+## 📊 My Contribution Stats
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ReyJerry/ReyJerry/output/pacman-contribution-graph-dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/ReyJerry/ReyJerry/output/pacman-contribution-graph.svg">
-  <img alt="pacman contribution graph" src="https://raw.githubusercontent.com/ReyJerry/ReyJerry/output/pacman-contribution-graph.svg">
-</picture>
-
-
+<!--STATS:START-->
+正在刷新统计数据……
+<!--STATS:END-->
