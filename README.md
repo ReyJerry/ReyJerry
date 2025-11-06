@@ -24,43 +24,35 @@
 <div align="left">
 
 <details>
-  <summary><b>⭐ Total Stars Earned：</b> <code>1</code></summary>
+  <summary><b>⭐ Total Stars Earned:</b> <code>1</code></summary>
 
   <br/>
-  <sub>（个人公开非 fork 仓库，按 Star → Fork 排序）</sub>
-
-| 仓库 | ⭐ Stars | Forks |
-|---|---:|---:|
-| <a href="https://github.com/ReyJerry/HydraNet">ReyJerry/HydraNet</a> | **1** | 0 |
-| <a href="https://github.com/ReyJerry/ReyJerry">ReyJerry/ReyJerry</a> | **0** | 0 |
-| <a href="https://github.com/ReyJerry/ReyJerry.github.io">ReyJerry/ReyJerry.github.io</a> | **0** | 0 |
-| <a href="https://github.com/ReyJerry/skills-introduction-to-github">ReyJerry/skills-introduction-to-github</a> | **0** | 0 |
+- <a href="https://github.com/ReyJerry/HydraNet">ReyJerry/HydraNet</a> <sub>· ⭐ 1 · 🍴 0</sub>
+- <a href="https://github.com/ReyJerry/skills-introduction-to-github">ReyJerry/skills-introduction-to-github</a> <sub>· ⭐ 0 · 🍴 0</sub>
+- <a href="https://github.com/ReyJerry/ReyJerry.github.io">ReyJerry/ReyJerry.github.io</a> <sub>· ⭐ 0 · 🍴 0</sub>
+- <a href="https://github.com/ReyJerry/ReyJerry">ReyJerry/ReyJerry</a> <sub>· ⭐ 0 · 🍴 0</sub>
 
 </details>
 
 <details>
-  <summary><b>🤝 Contributed to：</b> <code>5</code></summary>
+  <summary><b>🤝 Contributed to:</b> <code>5</code></summary>
 
   <br/>
-  <div>
-    <b>🧑‍💻 他人仓库</b>（按 Star → Fork 排序）
-  </div>
+  <div><b>👥 Other Repos</b></div>
 
-| 仓库 | ⭐ Stars | Forks | Commit | PR | Issue | Total |
-|---|---:|---:|---:|---:|---:|---:|
-| <a href="https://github.com/fla-org/flash-linear-attention">fla-org/flash-linear-attention</a> | 3751 | 292 | 1 | 2 | 1 | **4** |
+| Repository | 📝 Commits | 🔀 PRs | 🐛 Issues | ∑ Total |
+|---|---:|---:|---:|---:|
+| <a href="https://github.com/fla-org/flash-linear-attention">fla-org/flash-linear-attention</a> <sub>· ⭐ 3751 · 🍴 292</sub> | 1 | 2 | 1 | **4** |
 
   <br/><br/>
-  <div>
-    <b>📦 个人仓库</b>（按 Star → Fork 排序）
-  </div>
+  <div><b>📦 My Repos</b></div>
 
-| 仓库 | ⭐ Stars | Forks | Commit | PR | Issue | Total |
-|---|---:|---:|---:|---:|---:|---:|
-| <a href="https://github.com/ReyJerry/HydraNet">ReyJerry/HydraNet</a> | 1 | 0 | 11 | 0 | 0 | **11** |
-| <a href="https://github.com/ReyJerry/skills-introduction-to-github">ReyJerry/skills-introduction-to-github</a> | 0 | 0 | 3 | 1 | 0 | **4** |
-| <a href="https://github.com/ReyJerry/ReyJerry.github.io">ReyJerry/ReyJerry.github.io</a> | 0 | 0 | 426 | 0 | 0 | **426** |
-| <a href="https://github.com/ReyJerry/ReyJerry">ReyJerry/ReyJerry</a> | 0 | 0 | 11 | 0 | 0 | **11** |
+| Repository | 📝 Commits | 🔀 PRs | 🐛 Issues | ∑ Total |
+|---|---:|---:|---:|---:|
+| <a href="https://github.com/ReyJerry/HydraNet">ReyJerry/HydraNet</a> <sub>· ⭐ 1 · 🍴 0</sub> | 11 | 0 | 0 | **11** |
+| <a href="https://github.com/ReyJerry/skills-introduction-to-github">ReyJerry/skills-introduction-to-github</a> <sub>· ⭐ 0 · 🍴 0</sub> | 3 | 1 | 0 | **4** |
+| <a href="https://github.com/ReyJerry/ReyJerry.github.io">ReyJerry/ReyJerry.github.io</a> <sub>· ⭐ 0 · 🍴 0</sub> | 426 | 0 | 0 | **426** |
+| <a href="https://github.com/ReyJerry/ReyJerry">ReyJerry/ReyJerry</a> <sub>· ⭐ 0 · 🍴 0</sub> | 12 | 0 | 0 | **12** |
 
 </details>
 
