@@ -19,23 +19,17 @@ def gql(query, variables=None):
         raise RuntimeError(data["errors"])
     return data["data"]
 
-# 1) 自有公开仓库（非 fork）的 Stars/Forks 列表 + 总星标
+# 1) own public repos: list + total stars (sorted by stars -> forks)
 def get_own_public_repos_and_total_stars():
-    repos = []
-    total = 0
+    repos, total = [], 0
     cursor = None
     while True:
         q = """
         query($login:String!, $cursor:String) {
           user(login:$login){
-            repositories(ownerAffiliations: OWNER, isFork:false, privacy:PUBLIC, first:100, after:$cursor, orderBy:{field:STARGAZERS, direction:DESC}){
+            repositories(ownerAffiliations: OWNER, isFork:false, privacy:PUBLIC, first:100, after:$cursor){
               pageInfo { hasNextPage endCursor }
-              nodes {
-                nameWithOwner
-                url
-                stargazerCount
-                forkCount
-              }
+              nodes { nameWithOwner url stargazerCount forkCount }
             }
           }
         }"""
@@ -53,11 +47,10 @@ def get_own_public_repos_and_total_stars():
             cursor = page["pageInfo"]["endCursor"]
         else:
             break
-    # 统一排序：Star desc -> Fork desc
     repos.sort(key=lambda x: (-x["stars"], -x["forks"]))
     return repos, total
 
-# 2) 获取所有贡献年份
+# 2) contribution years
 def get_years():
     q = """
     query($login:String!){
@@ -72,7 +65,7 @@ def get_years():
         years.append(y)
     return years
 
-# 3) 按年聚合贡献（commit/pr/issue）并按仓库归并
+# 3) per-year contributions aggregated by repo
 def collect_by_year(year):
     start = datetime.datetime(year, 1, 1)
     end = datetime.datetime(year + 1, 1, 1) - relativedelta(seconds=1)
@@ -102,13 +95,10 @@ def collect_by_year(year):
     def add(repo, key, n):
         k = repo["nameWithOwner"]
         repo_map.setdefault(k, {
-            "url": repo["url"],
-            "stars": repo["stargazerCount"],
-            "forks": repo["forkCount"],
+            "url": repo["url"], "stars": repo["stargazerCount"], "forks": repo["forkCount"],
             "commit": 0, "pr": 0, "issue": 0
         })
         repo_map[k][key] += n
-        # 同步最新的 star/fork/url
         repo_map[k]["stars"] = repo["stargazerCount"]
         repo_map[k]["forks"] = repo["forkCount"]
         repo_map[k]["url"] = repo["url"]
@@ -122,7 +112,7 @@ def collect_by_year(year):
 
     return repo_map
 
-# 4) 全量汇总 + 拆分“他人仓库/个人仓库”
+# 4) all-time merge + split into mine / others; sort by stars -> forks
 def aggregate_contributions_all_time():
     years = get_years()
     merged = {}
@@ -138,7 +128,6 @@ def aggregate_contributions_all_time():
             merged[name]["forks"] = rec["forks"]
             merged[name]["url"] = rec["url"]
 
-    # 拆分：owner == LOGIN 划归“个人仓库”，否则“他人仓库”
     mine, others = [], []
     for name, v in merged.items():
         total = v["commit"] + v["pr"] + v["issue"]
@@ -148,73 +137,67 @@ def aggregate_contributions_all_time():
             "name": name, "url": v["url"], "stars": v["stars"], "forks": v["forks"],
             "commit": v["commit"], "pr": v["pr"], "issue": v["issue"], "total": total
         }
-        owner = name.split("/")[0] if "/" in name else ""
-        (mine if owner.lower() == LOGIN.lower() else others).append(row)
+        owner = name.split("/")[0].lower() if "/" in name else ""
+        (mine if owner == LOGIN.lower() else others).append(row)
 
-    # 排序：Star desc -> Fork desc
     keyf = lambda r: (-r["stars"], -r["forks"])
     mine.sort(key=keyf)
     others.sort(key=keyf)
 
-    return {
-        "mine": mine,
-        "others": others,
-        "count_total": len(mine) + len(others)
-    }
+    return {"mine": mine, "others": others, "count_total": len(mine) + len(others)}
 
-# 5) 渲染为更美观的 Markdown/HTML（表格+分组）
+# 5) pretty rendering
 def render_markdown(own_repos, total_stars, contrib):
+    def repo_badge(r):
+        # repo link + inline stars/forks badges
+        return f'<a href="{r["url"]}">{r["name"]}</a> <sub>· ⭐ {r["stars"]} · 🍴 {r["forks"]}</sub>'
+
     def tbl(rows):
         if not rows:
-            return "_(空)_"
-        header = "| 仓库 | ⭐ Stars | Forks | Commit | PR | Issue | Total |\n|---|---:|---:|---:|---:|---:|---:|"
+            return "_(empty)_"
+        header = (
+            "| Repository | 📝 Commits | 🔀 PRs | 🐛 Issues | ∑ Total |\n"
+            "|---|---:|---:|---:|---:|"
+        )
         lines = [
-            f'| <a href="{r["url"]}">{r["name"]}</a> | {r["stars"]} | {r["forks"]} | {r["commit"]} | {r["pr"]} | {r["issue"]} | **{r["total"]}** |'
+            f'| {repo_badge(r)} | {r["commit"]} | {r["pr"]} | {r["issue"]} | **{r["total"]}** |'
             for r in rows
         ]
         return "\n".join([header] + lines)
 
-    def tbl_stars(rows):
+    def list_stars(rows):
         if not rows:
-            return "_(空)_"
-        header = "| 仓库 | ⭐ Stars | Forks |\n|---|---:|---:|"
-        lines = [f'| <a href="{r["url"]}">{r["name"]}</a> | **{r["stars"]}** | {r["forks"]} |' for r in rows]
-        return "\n".join([header] + lines)
+            return "_(empty)_"
+        # bullet list for a cleaner look
+        return "\n".join([f'- {repo_badge(r)}' for r in rows])
 
     stars_block = f"""
 <details>
-  <summary><b>⭐ Total Stars Earned：</b> <code>{total_stars}</code></summary>
+  <summary><b>⭐ Total Stars Earned:</b> <code>{total_stars}</code></summary>
 
   <br/>
-  <sub>（个人公开非 fork 仓库，按 Star → Fork 排序）</sub>
-
-{tbl_stars(own_repos)}
+{list_stars(own_repos)}
 
 </details>
 """.strip()
 
     contrib_block = f"""
 <details>
-  <summary><b>🤝 Contributed to：</b> <code>{contrib["count_total"]}</code></summary>
+  <summary><b>🤝 Contributed to:</b> <code>{contrib["count_total"]}</code></summary>
 
   <br/>
-  <div>
-    <b>🧑‍💻 他人仓库</b>（按 Star → Fork 排序）
-  </div>
+  <div><b>👥 Other Repos</b></div>
 
 {tbl(contrib["others"])}
 
   <br/><br/>
-  <div>
-    <b>📦 个人仓库</b>（按 Star → Fork 排序）
-  </div>
+  <div><b>📦 My Repos</b></div>
 
 {tbl(contrib["mine"])}
 
 </details>
 """.strip()
 
-    # 页内整体容器，清爽对齐
     return f"""
 <div align="left">
 
