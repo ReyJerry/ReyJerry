@@ -1,4 +1,4 @@
-# Hi 👋, I'm BeiSheng
+# Hi 👋, I'm ReyJerry
 
 ### A passionate Scss developer
 
@@ -24,7 +24,6 @@
 
 <p>&nbsp;<img align="center" src="https://github-readme-stats.vercel.app/api?username=ReyJerry&show_icons=true&locale=en" alt="ReyJerry" /></p>
 
-###
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ReyJerry/ReyJerry/output/pacman-contribution-graph-dark.svg">
@@ -32,5 +31,4 @@
   <img alt="pacman contribution graph" src="https://raw.githubusercontent.com/ReyJerry/ReyJerry/output/pacman-contribution-graph.svg">
 </picture>
 
-###
 
