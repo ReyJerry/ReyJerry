@@ -29,8 +29,8 @@
 </details>
 
 <details>
-  <summary><b>🧮 Total Commits:</b> <code>450</code></summary>
-  - 历史总提交：**450**（按年份累计）
+  <summary><b>🧮 Total Commits:</b> <code>451</code></summary>
+  - 历史总提交：**451**（按年份累计）
 </details>
 
 <details>
@@ -48,7 +48,7 @@
 
 - <a href="https://github.com/ReyJerry/ReyJerry.github.io">ReyJerry/ReyJerry.github.io</a> — 贡献 <b>426</b> 次（Commit 426 · PR 0 · Issue 0） · ⭐ <b>0</b> · Fork <b>0</b>
 - <a href="https://github.com/ReyJerry/HydraNet">ReyJerry/HydraNet</a> — 贡献 <b>11</b> 次（Commit 11 · PR 0 · Issue 0） · ⭐ <b>1</b> · Fork <b>0</b>
-- <a href="https://github.com/ReyJerry/ReyJerry">ReyJerry/ReyJerry</a> — 贡献 <b>9</b> 次（Commit 9 · PR 0 · Issue 0） · ⭐ <b>0</b> · Fork <b>0</b>
+- <a href="https://github.com/ReyJerry/ReyJerry">ReyJerry/ReyJerry</a> — 贡献 <b>10</b> 次（Commit 10 · PR 0 · Issue 0） · ⭐ <b>0</b> · Fork <b>0</b>
 - <a href="https://github.com/fla-org/flash-linear-attention">fla-org/flash-linear-attention</a> — 贡献 <b>4</b> 次（Commit 1 · PR 2 · Issue 1） · ⭐ <b>3751</b> · Fork <b>292</b>
 - <a href="https://github.com/ReyJerry/skills-introduction-to-github">ReyJerry/skills-introduction-to-github</a> — 贡献 <b>4</b> 次（Commit 3 · PR 1 · Issue 0） · ⭐ <b>0</b> · Fork <b>0</b>
 </details>
