@@ -33,14 +33,15 @@
 </details>
 
 <details>
-  <summary><b>🤝 Contributed to:</b> <code>4</code></summary>
+  <summary><b>🤝 Contributed to:</b> <code>5</code></summary>
 
   <br/>
   <div><b>👥 Other Repos</b></div>
 
 | Repository | 📝 Commits | 🔀 PRs | 🐛 Issues | ∑ Total |
 |:--|--:|--:|--:|--:|
-| <a href="https://github.com/fla-org/flash-linear-attention">Flash Linear Attention</a> <sub>· ⭐ 3.9k+ 🔥 · 🍴 306</sub> | `1` | `2` | `1` | **`4`** |
+| <a href="https://github.com/fla-org/flash-linear-attention">Flash Linear Attention</a> <sub>· ⭐ 3.9k+ 🔥 · 🍴 307</sub> | `1` | `2` | `1` | **`4`** |
+| <a href="https://github.com/mit-han-lab/flash-moba">Flash Moba</a> <sub>· ⭐ 160 · 🍴 6</sub> | `2` | `1` | `1` | **`4`** |
 
   <br/><br/>
   <div><b>📦 My Repos</b></div>
