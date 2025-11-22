@@ -41,7 +41,7 @@
 | Repository | 📝 Commits | 🔀 PRs | 🐛 Issues | ∑ Total |
 |:--|--:|--:|--:|--:|
 | <a href="https://github.com/fla-org/flash-linear-attention">Flash Linear Attention</a> <sub>· ⭐ 3.9k+ 🔥 · 🍴 307</sub> | `1` | `2` | `1` | **`4`** |
-| <a href="https://github.com/mit-han-lab/flash-moba">Flash Moba</a> <sub>· ⭐ 167 · 🍴 6</sub> | `2` | `1` | `1` | **`4`** |
+| <a href="https://github.com/mit-han-lab/flash-moba">Flash Moba</a> <sub>· ⭐ 169 · 🍴 6</sub> | `2` | `1` | `1` | **`4`** |
 
   <br/><br/>
   <div><b>📦 My Repos</b></div>
@@ -49,7 +49,7 @@
 | Repository | 📝 Commits | 🔀 PRs | 🐛 Issues | ∑ Total |
 |:--|--:|--:|--:|--:|
 | <a href="https://github.com/ReyJerry/HydraNet">Hydranet</a> <sub>· ⭐ 1 · 🍴 0</sub> | `12` | `0` | `0` | **`12`** |
-| <a href="https://github.com/ReyJerry/ReyJerry.github.io">Reyjerry.github.io</a> <sub>· ⭐ 0 · 🍴 0</sub> | `432` | `0` | `0` | **`432`** |
+| <a href="https://github.com/ReyJerry/ReyJerry.github.io">Reyjerry.github.io</a> <sub>· ⭐ 0 · 🍴 0</sub> | `433` | `0` | `0` | **`433`** |
 | <a href="https://github.com/ReyJerry/ReyJerry">Reyjerry</a> <sub>· ⭐ 0 · 🍴 0</sub> | `14` | `0` | `0` | **`14`** |
 
 </details>
