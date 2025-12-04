@@ -40,7 +40,7 @@
 
 | Repository | 📝 Commits | 🔀 PRs | 🐛 Issues | ∑ Total |
 |:--|--:|--:|--:|--:|
-| <a href="https://github.com/fla-org/flash-linear-attention">Flash Linear Attention</a> <sub>· ⭐ 4k+ 🔥 · 🍴 321</sub> | `1` | `2` | `1` | **`4`** |
+| <a href="https://github.com/fla-org/flash-linear-attention">Flash Linear Attention</a> <sub>· ⭐ 4k+ 🔥 · 🍴 322</sub> | `1` | `2` | `1` | **`4`** |
 | <a href="https://github.com/mit-han-lab/flash-moba">Flash Moba</a> <sub>· ⭐ 201 · 🍴 6</sub> | `2` | `1` | `1` | **`4`** |
 
   <br/><br/>
