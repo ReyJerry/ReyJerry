@@ -30,10 +30,11 @@
 - <a href="https://github.com/ReyJerry/HydraNet">Hydranet</a> <sub>· ⭐ 1 · 🍴 0</sub>
 - <a href="https://github.com/ReyJerry/ReyJerry.github.io">Reyjerry.github.io</a> <sub>· ⭐ 0 · 🍴 0</sub>
 - <a href="https://github.com/ReyJerry/ReyJerry">Reyjerry</a> <sub>· ⭐ 0 · 🍴 0</sub>
+- <a href="https://github.com/ReyJerry/Triton-MoBA">Triton Moba</a> <sub>· ⭐ 0 · 🍴 0</sub>
 </details>
 
 <details>
-  <summary><b>🤝 Contributed to:</b> <code>6</code></summary>
+  <summary><b>🤝 Contributed to:</b> <code>7</code></summary>
 
   <br/>
   <div><b>👥 Other Repos</b></div>
@@ -51,7 +52,8 @@
 |:--|--:|--:|--:|--:|
 | <a href="https://github.com/ReyJerry/HydraNet">Hydranet</a> <sub>· ⭐ 1 · 🍴 0</sub> | `12` | `0` | `0` | **`12`** |
 | <a href="https://github.com/ReyJerry/ReyJerry.github.io">Reyjerry.github.io</a> <sub>· ⭐ 0 · 🍴 0</sub> | `435` | `0` | `0` | **`435`** |
-| <a href="https://github.com/ReyJerry/ReyJerry">Reyjerry</a> <sub>· ⭐ 0 · 🍴 0</sub> | `15` | `0` | `0` | **`15`** |
+| <a href="https://github.com/ReyJerry/ReyJerry">Reyjerry</a> <sub>· ⭐ 0 · 🍴 0</sub> | `16` | `0` | `0` | **`16`** |
+| <a href="https://github.com/ReyJerry/Triton-MoBA">Triton Moba</a> <sub>· ⭐ 0 · 🍴 0</sub> | `1` | `0` | `0` | **`1`** |
 
 </details>
 
