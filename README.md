@@ -32,6 +32,7 @@
 - <a href="https://github.com/ReyJerry/ReyJerry.github.io">Reyjerry.github.io</a> <sub>· ⭐ 0 · 🍴 0</sub>
 - <a href="https://github.com/ReyJerry/ReyJerry">Reyjerry</a> <sub>· ⭐ 0 · 🍴 0</sub>
 - <a href="https://github.com/ReyJerry/flaa">Flaa</a> <sub>· ⭐ 0 · 🍴 0</sub>
+- <a href="https://github.com/ReyJerry/hyper-ssa-5">Hyper Ssa 5</a> <sub>· ⭐ 0 · 🍴 0</sub>
 </details>
 
 <details>
