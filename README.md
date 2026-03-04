@@ -33,10 +33,11 @@
 - <a href="https://github.com/ReyJerry/ReyJerry">Reyjerry</a> <sub>· ⭐ 0 · 🍴 0</sub>
 - <a href="https://github.com/ReyJerry/flaa">Flaa</a> <sub>· ⭐ 0 · 🍴 0</sub>
 - <a href="https://github.com/ReyJerry/hyper-ssa-5">Hyper Ssa 5</a> <sub>· ⭐ 0 · 🍴 0</sub>
+- <a href="https://github.com/ReyJerry/Playlist-Understands-You">Playlist Understands You</a> <sub>· ⭐ 0 · 🍴 0</sub>
 </details>
 
 <details>
-  <summary><b>🤝 Contributed to:</b> <code>8</code></summary>
+  <summary><b>🤝 Contributed to:</b> <code>9</code></summary>
 
   <br/>
   <div><b>👥 Other Repos</b></div>
@@ -57,6 +58,7 @@
 | <a href="https://github.com/ReyJerry/ReyJerry.github.io">Reyjerry.github.io</a> <sub>· ⭐ 0 · 🍴 0</sub> | `445` | `0` | `0` | **`445`** |
 | <a href="https://github.com/ReyJerry/ReyJerry">Reyjerry</a> <sub>· ⭐ 0 · 🍴 0</sub> | `16` | `0` | `0` | **`16`** |
 | <a href="https://github.com/ReyJerry/flaa">Flaa</a> <sub>· ⭐ 0 · 🍴 0</sub> | `16` | `0` | `0` | **`16`** |
+| <a href="https://github.com/ReyJerry/Playlist-Understands-You">Playlist Understands You</a> <sub>· ⭐ 0 · 🍴 0</sub> | `2` | `0` | `0` | **`2`** |
 
 </details>
 
