@@ -44,9 +44,9 @@
 
 | Repository | 📝 Commits | 🔀 PRs | 🐛 Issues | ∑ Total |
 |:--|--:|--:|--:|--:|
-| <a href="https://github.com/fla-org/flash-linear-attention">Flash Linear Attention</a> <sub>· ⭐ 4.7k+ 🔥 · 🍴 449</sub> | `1` | `2` | `2` | **`5`** |
+| <a href="https://github.com/fla-org/flash-linear-attention">Flash Linear Attention</a> <sub>· ⭐ 4.7k+ 🔥 · 🍴 454</sub> | `1` | `2` | `2` | **`5`** |
 | <a href="https://github.com/MoonshotAI/MoBA">Moba</a> <sub>· ⭐ 2.1k+ 🔥 · 🍴 138</sub> | `0` | `1` | `0` | **`1`** |
-| <a href="https://github.com/mit-han-lab/flash-moba">Flash Moba</a> <sub>· ⭐ 235 · 🍴 9</sub> | `2` | `1` | `1` | **`4`** |
+| <a href="https://github.com/mit-han-lab/flash-moba">Flash Moba</a> <sub>· ⭐ 236 · 🍴 9</sub> | `2` | `1` | `1` | **`4`** |
 
   <br/><br/>
   <div><b>📦 My Repos</b></div>
@@ -55,7 +55,7 @@
 |:--|--:|--:|--:|--:|
 | <a href="https://github.com/ReyJerry/Triton-MoBA">Triton Moba</a> <sub>· ⭐ 2 · 🍴 0</sub> | `1` | `0` | `0` | **`1`** |
 | <a href="https://github.com/ReyJerry/HydraNet">Hydranet</a> <sub>· ⭐ 1 · 🍴 0</sub> | `18` | `0` | `0` | **`18`** |
-| <a href="https://github.com/ReyJerry/ReyJerry.github.io">Reyjerry.github.io</a> <sub>· ⭐ 0 · 🍴 0</sub> | `447` | `0` | `0` | **`447`** |
+| <a href="https://github.com/ReyJerry/ReyJerry.github.io">Reyjerry.github.io</a> <sub>· ⭐ 0 · 🍴 0</sub> | `449` | `0` | `0` | **`449`** |
 | <a href="https://github.com/ReyJerry/ReyJerry">Reyjerry</a> <sub>· ⭐ 0 · 🍴 0</sub> | `16` | `0` | `0` | **`16`** |
 | <a href="https://github.com/ReyJerry/flaa">Flaa</a> <sub>· ⭐ 0 · 🍴 0</sub> | `16` | `0` | `0` | **`16`** |
 | <a href="https://github.com/ReyJerry/Playlist-Understands-You">Playlist Understands You</a> <sub>· ⭐ 0 · 🍴 0</sub> | `2` | `0` | `0` | **`2`** |
