@@ -116,33 +116,37 @@ def get_pr_lines():
     """Fallback: Get additions and deletions from user's merged PRs"""
     pr_stats = {}
     cursor = None
-    while True:
-        q = """
-        query($login:String!, $cursor:String) {
-          user(login:$login){
-            pullRequests(states: MERGED, first: 100, after: $cursor){
-              pageInfo { hasNextPage endCursor }
-              nodes {
-                repository { nameWithOwner }
-                additions
-                deletions
+    try:
+        while True:
+            q = """
+            query($login:String!, $cursor:String) {
+              user(login:$login){
+                pullRequests(states: [MERGED], first: 100, after: $cursor){
+                  pageInfo { hasNextPage endCursor }
+                  nodes {
+                    repository { nameWithOwner }
+                    additions
+                    deletions
+                  }
+                }
               }
-            }
-          }
-        }"""
-        d = gql(q, {"login": LOGIN, "cursor": cursor})
-        page = d["user"]["pullRequests"]
-        for n in page["nodes"]:
-            repo = n["repository"]["nameWithOwner"]
-            if repo not in pr_stats:
-                pr_stats[repo] = {"additions": 0, "deletions": 0}
-            pr_stats[repo]["additions"] += n["additions"]
-            pr_stats[repo]["deletions"] += n["deletions"]
+            }"""
+            d = gql(q, {"login": LOGIN, "cursor": cursor})
+            page = d["user"]["pullRequests"]
+            for n in page["nodes"]:
+                repo = n["repository"]["nameWithOwner"]
+                if repo not in pr_stats:
+                    pr_stats[repo] = {"additions": 0, "deletions": 0}
+                pr_stats[repo]["additions"] += n["additions"]
+                pr_stats[repo]["deletions"] += n["deletions"]
+            
+            if page["pageInfo"]["hasNextPage"]:
+                cursor = page["pageInfo"]["endCursor"]
+            else:
+                break
+    except Exception as e:
+        print(f"Warning: Fetching PR lines failed: {e}", file=sys.stderr)
         
-        if page["pageInfo"]["hasNextPage"]:
-            cursor = page["pageInfo"]["endCursor"]
-        else:
-            break
     return pr_stats
 
 def aggregate_contributions_all_time():
@@ -186,26 +190,27 @@ def aggregate_contributions_all_time():
             url = f"https://api.github.com/repos/{repo_name}/stats/contributors"
             found_in_rest = False
             
-            # GitHub API can return 202 if caching, we retry up to 3 times
-            for _ in range(3):
-                resp = requests.get(url, headers=HEADERS)
-                if resp.status_code == 200:
-                    data = resp.json()
-                    if isinstance(data, list):
-                        for item in data:
-                            author = item.get("author")
-                            if author and author.get("login", "").lower() == LOGIN.lower():
-                                r["additions"] = sum(w["a"] for w in item["weeks"])
-                                r["deletions"] = sum(w["d"] for w in item["weeks"])
-                                found_in_rest = True
-                                break
-                    break
-                elif resp.status_code == 202:
-                    time.sleep(2)
-                else:
-                    break
+            try:
+                for _ in range(3):
+                    resp = requests.get(url, headers=HEADERS)
+                    if resp.status_code == 200:
+                        data = resp.json()
+                        if isinstance(data, list):
+                            for item in data:
+                                author = item.get("author")
+                                if author and author.get("login", "").lower() == LOGIN.lower():
+                                    r["additions"] = sum(w["a"] for w in item["weeks"])
+                                    r["deletions"] = sum(w["d"] for w in item["weeks"])
+                                    found_in_rest = True
+                                    break
+                        break
+                    elif resp.status_code == 202:
+                        time.sleep(2)
+                    else:
+                        break
+            except Exception as e:
+                print(f"Warning: Fetching REST API stats failed for {repo_name}: {e}", file=sys.stderr)
             
-            # If not found in top 100 or API failed, fallback to PR query
             if not found_in_rest or (r["additions"] == 0 and r["deletions"] == 0):
                 if repo_name in pr_lines:
                     r["additions"] = pr_lines[repo_name]["additions"]
@@ -244,15 +249,17 @@ def repo_chip(name, url, stars, forks):
 def md_table_contrib(rows):
     if not rows:
         return "_(empty)_"
-    # 添加了 💻 Code 列来展示增加和减少的代码行数
+    
+    # 严格对齐Markdown表格格式，去掉了可能导致解析问题的括号
     header = (
-        "| Repository | 📝 Commits | 🔀 PRs | 🐛 Issues | 💻 Code (+/-) | ∑ Total |\n"
-        "|:--|--:|--:|--:|--:|--:|"
+        "| Repository | 📝 Commits | 🔀 PRs | 🐛 Issues | 💻 Code | ∑ Total |\n"
+        "| :--- | ---: | ---: | ---: | ---: | ---: |"
     )
     lines = []
     for r in rows:
         adds = r.get("additions", 0)
         dels = r.get("deletions", 0)
+        
         if adds == 0 and dels == 0:
             code_str = "-"
         else:
@@ -287,11 +294,13 @@ def render_markdown(own_repos, total_stars, contrib):
   <summary><b>🤝 Contributed to:</b> <code>{contrib["count_total"]}</code></summary>
 
   <br/>
+
   <div><b>👥 Other Repos</b></div>
 
 {md_table_contrib(contrib["others"])}
 
   <br/><br/>
+
   <div><b>📦 My Repos</b></div>
 
 {md_table_contrib(contrib["mine"])}
@@ -303,6 +312,8 @@ def render_markdown(own_repos, total_stars, contrib):
 <div align="left">
 
 {stars_block}
+
+<br/>
 
 {contrib_block}
 
@@ -319,6 +330,7 @@ def main():
     with open("README.md", "r", encoding="utf-8") as f:
         content = f.read()
 
+    # 替换 README 内容
     pattern = re.compile(r"()(.*?)()", re.S)
     new = re.sub(pattern, r"\1\n" + block + r"\n\3", content)
 
