@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os, sys, datetime, time
+import os, sys, datetime
 from dateutil.relativedelta import relativedelta
 import requests
 
@@ -246,18 +246,18 @@ def md_table_contrib(rows):
     if not rows:
         return "_(empty)_"
     
+    # 严格使用原版表头格式，仅插入 💻 Code 一列
     header = (
         "| Repository | 📝 Commits | 🔀 PRs | 🐛 Issues | 💻 Code | ∑ Total |\n"
-        "|:---|---:|---:|---:|---:|---:|"
+        "|:--|--:|--:|--:|--:|--:|"
     )
     lines = []
     for r in rows:
         adds = r.get("additions", 0)
         dels = r.get("deletions", 0)
         
-        # 抛弃单杠 "-"，避免 GitHub 表格解析引擎误认为是行内分割线
         if adds == 0 and dels == 0:
-            code_str = "0"
+            code_str = "-"
         else:
             code_str = f"+{adds} / -{dels}"
             
@@ -276,31 +276,42 @@ def md_list_own_stars(rows):
 # ---------- render blocks ----------
 
 def render_markdown(own_repos, total_stars, contrib):
-    # 彻底移除会诱发崩溃的 <div align="left"> 和 <br/> 标签，回归安全的原生 Markdown 排版
+    # 完全复刻原版排版（保留了 <div align="left"> 和 <br/> 等使得页面渲染美观的标签）
     stars_block = f"""
 <details>
-<summary><b>⭐ Total Stars Earned:</b> <code>{to_k_plus(total_stars)}</code></summary>
+  <summary><b>⭐ Total Stars Earned:</b> <code>{to_k_plus(total_stars)}</code></summary>
 
+  <br/>
 {md_list_own_stars(own_repos)}
 </details>
 """.strip()
 
     contrib_block = f"""
 <details>
-<summary><b>🤝 Contributed to:</b> <code>{contrib["count_total"]}</code></summary>
+  <summary><b>🤝 Contributed to:</b> <code>{contrib["count_total"]}</code></summary>
 
-**👥 Other Repos**
+  <br/>
+  <div><b>👥 Other Repos</b></div>
 
 {md_table_contrib(contrib["others"])}
 
-**📦 My Repos**
+  <br/><br/>
+  <div><b>📦 My Repos</b></div>
 
 {md_table_contrib(contrib["mine"])}
 
 </details>
 """.strip()
 
-    return f"{stars_block}\n\n{contrib_block}"
+    return f"""
+<div align="left">
+
+{stars_block}
+
+{contrib_block}
+
+</div>
+""".strip()
 
 # ---------- main ----------
 
