@@ -7,9 +7,10 @@ on:
   push:
     branches: [ main, master ]
 
-# Opt into Node.js 24 to fix the deprecation warning
+# 开启 Node.js 24 和 Python 实时日志打印
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  PYTHONUNBUFFERED: "1"
 
 jobs:
   build:
