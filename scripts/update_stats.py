@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os, re, sys, datetime
+import os, re, sys, datetime, time
 from dateutil.relativedelta import relativedelta
 import requests
 
@@ -112,6 +112,39 @@ def collect_by_year(year):
 
     return repo_map
 
+def get_pr_lines():
+    """Fallback: Get additions and deletions from user's merged PRs"""
+    pr_stats = {}
+    cursor = None
+    while True:
+        q = """
+        query($login:String!, $cursor:String) {
+          user(login:$login){
+            pullRequests(states: MERGED, first: 100, after: $cursor){
+              pageInfo { hasNextPage endCursor }
+              nodes {
+                repository { nameWithOwner }
+                additions
+                deletions
+              }
+            }
+          }
+        }"""
+        d = gql(q, {"login": LOGIN, "cursor": cursor})
+        page = d["user"]["pullRequests"]
+        for n in page["nodes"]:
+            repo = n["repository"]["nameWithOwner"]
+            if repo not in pr_stats:
+                pr_stats[repo] = {"additions": 0, "deletions": 0}
+            pr_stats[repo]["additions"] += n["additions"]
+            pr_stats[repo]["deletions"] += n["deletions"]
+        
+        if page["pageInfo"]["hasNextPage"]:
+            cursor = page["pageInfo"]["endCursor"]
+        else:
+            break
+    return pr_stats
+
 def aggregate_contributions_all_time():
     years = get_years()
     merged = {}
@@ -134,7 +167,8 @@ def aggregate_contributions_all_time():
             continue
         row = {
             "name": name, "url": v["url"], "stars": v["stars"], "forks": v["forks"],
-            "commit": v["commit"], "pr": v["pr"], "issue": v["issue"], "total": total
+            "commit": v["commit"], "pr": v["pr"], "issue": v["issue"], "total": total,
+            "additions": 0, "deletions": 0
         }
         owner = name.split("/")[0].lower() if "/" in name else ""
         (mine if owner == LOGIN.lower() else others).append(row)
@@ -142,6 +176,43 @@ def aggregate_contributions_all_time():
     keyf = lambda r: (-r["stars"], -r["forks"])
     mine.sort(key=keyf)
     others.sort(key=keyf)
+
+    # Fetch Code Lines Data
+    pr_lines = get_pr_lines()
+
+    def fetch_lines(repos):
+        for r in repos:
+            repo_name = r["name"]
+            url = f"https://api.github.com/repos/{repo_name}/stats/contributors"
+            found_in_rest = False
+            
+            # GitHub API can return 202 if caching, we retry up to 3 times
+            for _ in range(3):
+                resp = requests.get(url, headers=HEADERS)
+                if resp.status_code == 200:
+                    data = resp.json()
+                    if isinstance(data, list):
+                        for item in data:
+                            author = item.get("author")
+                            if author and author.get("login", "").lower() == LOGIN.lower():
+                                r["additions"] = sum(w["a"] for w in item["weeks"])
+                                r["deletions"] = sum(w["d"] for w in item["weeks"])
+                                found_in_rest = True
+                                break
+                    break
+                elif resp.status_code == 202:
+                    time.sleep(2)
+                else:
+                    break
+            
+            # If not found in top 100 or API failed, fallback to PR query
+            if not found_in_rest or (r["additions"] == 0 and r["deletions"] == 0):
+                if repo_name in pr_lines:
+                    r["additions"] = pr_lines[repo_name]["additions"]
+                    r["deletions"] = pr_lines[repo_name]["deletions"]
+
+    fetch_lines(mine)
+    fetch_lines(others)
 
     return {"mine": mine, "others": others, "count_total": len(mine) + len(others)}
 
@@ -167,28 +238,35 @@ def repo_chip(name, url, stars, forks):
     """Repository link with inline star/fork chips, and 🔥 for 1k+ stars."""
     star_text = to_k_plus(stars)
     fire = " 🔥" if stars >= 1000 else ""
-    # show name only, hyperlink to repo
     pretty = pretty_repo_text(name)
     return f'<a href="{url}">{pretty}</a> <sub>· ⭐ {star_text}{fire} · 🍴 {forks}</sub>'
 
 def md_table_contrib(rows):
     if not rows:
         return "_(empty)_"
+    # 添加了 💻 Code 列来展示增加和减少的代码行数
     header = (
-        "| Repository | 📝 Commits | 🔀 PRs | 🐛 Issues | ∑ Total |\n"
-        "|:--|--:|--:|--:|--:|"
+        "| Repository | 📝 Commits | 🔀 PRs | 🐛 Issues | 💻 Code (+/-) | ∑ Total |\n"
+        "|:--|--:|--:|--:|--:|--:|"
     )
-    lines = [
-        f'| {repo_chip(r["name"], r["url"], r["stars"], r["forks"])} | '
-        f'`{r["commit"]}` | `{r["pr"]}` | `{r["issue"]}` | **`{r["total"]}`** |'
-        for r in rows
-    ]
+    lines = []
+    for r in rows:
+        adds = r.get("additions", 0)
+        dels = r.get("deletions", 0)
+        if adds == 0 and dels == 0:
+            code_str = "-"
+        else:
+            code_str = f"+{adds} / -{dels}"
+            
+        line = (f'| {repo_chip(r["name"], r["url"], r["stars"], r["forks"])} | '
+                f'`{r["commit"]}` | `{r["pr"]}` | `{r["issue"]}` | `{code_str}` | **`{r["total"]}`** |')
+        lines.append(line)
+        
     return "\n".join([header] + lines)
 
 def md_list_own_stars(rows):
     if not rows:
         return "_(empty)_"
-    # bullet list looks classy for a longer set
     items = [f'- {repo_chip(r["name"], r["url"], r["stars"], r["forks"])}' for r in rows]
     return "\n".join(items)
 
@@ -241,7 +319,7 @@ def main():
     with open("README.md", "r", encoding="utf-8") as f:
         content = f.read()
 
-    pattern = re.compile(r"(<!--STATS:START-->)(.*?)(<!--STATS:END-->)", re.S)
+    pattern = re.compile(r"()(.*?)()", re.S)
     new = re.sub(pattern, r"\1\n" + block + r"\n\3", content)
 
     if new != content:
