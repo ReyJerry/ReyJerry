@@ -7,6 +7,10 @@ on:
   push:
     branches: [ main, master ]
 
+# Opt into Node.js 24 to fix the deprecation warning
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
