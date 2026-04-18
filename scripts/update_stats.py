@@ -116,7 +116,7 @@ def collect_by_year(year):
 def get_pr_lines():
     pr_stats = {}
     cursor = None
-    print("Fetching fallback PR code lines data...")
+    print("Fetching GraphQL Pull Request code lines...")
     try:
         while True:
             q = """
@@ -182,57 +182,48 @@ def aggregate_contributions_all_time():
     mine.sort(key=keyf)
     others.sort(key=keyf)
 
-    # Fetch Code Lines Data
+    # 核心优化点：极速拉取策略
     pr_lines = get_pr_lines()
 
-    def fetch_lines(repos, category_name):
-        print(f"\n--- Fetching Deep Code Stats for {category_name} Repos ---")
-        for r in repos:
-            repo_name = r["name"]
-            print(f" > Requesting stats for {repo_name}...")
-            url = f"https://api.github.com/repos/{repo_name}/stats/contributors"
-            found_in_rest = False
-            
-            try:
-                for attempt in range(3):
-                    resp = requests.get(url, headers=HEADERS, timeout=10)
-                    if resp.status_code == 200:
-                        data = resp.json()
-                        if isinstance(data, list):
-                            for item in data:
-                                author = item.get("author")
-                                if author and author.get("login", "").lower() == LOGIN.lower():
-                                    r["additions"] = sum(w["a"] for w in item["weeks"])
-                                    r["deletions"] = sum(w["d"] for w in item["weeks"])
-                                    found_in_rest = True
-                                    break
-                        print(f"   [OK] Found data for {repo_name}")
-                        break
-                    elif resp.status_code == 202:
-                        print(f"   [Wait] GitHub is caching {repo_name}, retrying in 2s (attempt {attempt+1}/3)...")
-                        time.sleep(2)
-                    else:
-                        print(f"   [Skip] API returned {resp.status_code} for {repo_name}")
-                        break
-            except Exception as e:
-                print(f"   [Error] REST API failed for {repo_name}: {e}", file=sys.stderr)
-            
-            if not found_in_rest or (r["additions"] == 0 and r["deletions"] == 0):
-                if repo_name in pr_lines:
-                    r["additions"] = pr_lines[repo_name]["additions"]
-                    r["deletions"] = pr_lines[repo_name]["deletions"]
-                    print(f"   [Fallback] Used PR data for {repo_name}")
+    print("\n--- Mapping Code Stats ---")
+    
+    # 1. 对于别人的仓库：直接使用瞬间拉取好的 PR 数据，防止在大仓库请求 REST API 卡死
+    for r in others:
+        repo_name = r["name"]
+        if repo_name in pr_lines:
+            r["additions"] = pr_lines[repo_name]["additions"]
+            r["deletions"] = pr_lines[repo_name]["deletions"]
+            print(f" [Fast] Applied PR stats for other repo: {repo_name}")
 
-    fetch_lines(mine, "My")
-    fetch_lines(others, "Other")
+    # 2. 对于你自己的仓库：因为比较小，直接请求 REST API 是秒回的，可以捕捉到你直接 Push 的代码量
+    for r in mine:
+        repo_name = r["name"]
+        # 先用 PR 数据保底
+        if repo_name in pr_lines:
+            r["additions"] = pr_lines[repo_name]["additions"]
+            r["deletions"] = pr_lines[repo_name]["deletions"]
+            
+        url = f"https://api.github.com/repos/{repo_name}/stats/contributors"
+        try:
+            resp = requests.get(url, headers=HEADERS, timeout=5)
+            if resp.status_code == 200:
+                data = resp.json()
+                if isinstance(data, list):
+                    for item in data:
+                        author = item.get("author")
+                        if author and author.get("login", "").lower() == LOGIN.lower():
+                            r["additions"] = sum(w["a"] for w in item["weeks"])
+                            r["deletions"] = sum(w["d"] for w in item["weeks"])
+                            print(f" [Deep] Fetched commit stats for my repo: {repo_name}")
+                            break
+        except Exception as e:
+            print(f" [Skip] API timeout for {repo_name}, using PR fallback.", file=sys.stderr)
 
-    print("\nAll data successfully fetched!")
     return {"mine": mine, "others": others, "count_total": len(mine) + len(others)}
 
 # ---------- pretty formatting ----------
 
 def to_k_plus(n: int) -> str:
-    """1_234 -> 1.2k+ ; 987 -> 987"""
     if n >= 1000:
         v = f"{n/1000:.1f}".rstrip("0").rstrip(".")
         return f"{v}k+"
@@ -326,7 +317,7 @@ def render_markdown(own_repos, total_stars, contrib):
 # ---------- main ----------
 
 def main():
-    print("Starting GitHub stats update process...")
+    print("🚀 Starting GitHub stats update process (Fast Mode)...")
     own_repos, total_stars = get_own_public_repos_and_total_stars()
     contrib = aggregate_contributions_all_time()
     block = render_markdown(own_repos, total_stars, contrib)
@@ -340,9 +331,9 @@ def main():
     if new != content:
         with open("README.md", "w", encoding="utf-8") as f:
             f.write(new)
-        print("\nSUCCESS: README.md has been updated with new stats.")
+        print("\n✅ SUCCESS: README.md has been updated with new stats.")
     else:
-        print("\nSUCCESS: No changes detected. README.md is already up to date.")
+        print("\n✅ SUCCESS: No changes detected. README.md is already up to date.")
 
 if __name__ == "__main__":
     if not LOGIN or not TOKEN:
