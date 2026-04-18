@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os, re, sys, datetime, time
+import os, sys, datetime, time
 from dateutil.relativedelta import relativedelta
 import requests
 
@@ -11,7 +11,7 @@ TOKEN = os.environ.get("GITHUB_TOKEN", "").strip()
 API = "https://api.github.com/graphql"
 HEADERS = {"Authorization": f"bearer {TOKEN}"}
 
-# 强制实时刷新日志的函数，防止假死黑屏
+# 强制实时刷新日志的函数
 def log(msg):
     print(msg, flush=True)
 
@@ -28,7 +28,7 @@ def gql(query, variables=None):
 def get_own_public_repos_and_total_stars():
     repos, total = [], 0
     cursor = None
-    log("▶ [1/4] Fetching own repositories and total stars...")
+    log("▶ [1/5] Fetching own repositories and total stars...")
     while True:
         q = """
         query($login:String!, $cursor:String) {
@@ -54,7 +54,6 @@ def get_own_public_repos_and_total_stars():
         else:
             break
     repos.sort(key=lambda x: (-x["stars"], -x["forks"]))
-    log(f"  └ Found {len(repos)} public repos. Stars: {total}")
     return repos, total
 
 def get_years():
@@ -72,7 +71,7 @@ def get_years():
     return years
 
 def collect_by_year(year):
-    log(f"▶ [2/4] Collecting basic contributions for year {year}...")
+    log(f"▶ [2/5] Collecting basic contributions for year {year}...")
     start = datetime.datetime(year, 1, 1)
     end = datetime.datetime(year + 1, 1, 1) - relativedelta(seconds=1)
     q = """
@@ -121,10 +120,9 @@ def collect_by_year(year):
 def get_pr_lines():
     pr_stats = {}
     cursor = None
-    log("▶ [3/4] Fetching all Pull Request code lines via GraphQL (Safe Mode)...")
+    log("▶ [3/5] Fetching all Pull Request code lines via GraphQL...")
     try:
         while True:
-            # 移除了状态过滤，采用全量拉取并在代码中进行过滤，避免 API 报错
             q = """
             query($login:String!, $cursor:String) {
               user(login:$login){
@@ -153,7 +151,6 @@ def get_pr_lines():
                 cursor = page["pageInfo"]["endCursor"]
             else:
                 break
-        log("  └ PR lines successfully mapped.")
     except Exception as e:
         log(f"  [ERROR] Fetching PR lines failed: {e}")
         
@@ -191,17 +188,15 @@ def aggregate_contributions_all_time():
     mine.sort(key=keyf)
     others.sort(key=keyf)
 
-    # Core Stats Assignment
     pr_lines = get_pr_lines()
 
-    log("\n▶ [4/4] Mapping Code Additions/Deletions...")
+    log("▶ [4/5] Mapping Code Additions/Deletions...")
     
     for r in others:
         repo_name = r["name"]
         if repo_name in pr_lines:
             r["additions"] = pr_lines[repo_name]["additions"]
             r["deletions"] = pr_lines[repo_name]["deletions"]
-            log(f"  └ [Fast-Map] Linked PR stats for other repo: {repo_name}")
 
     for r in mine:
         repo_name = r["name"]
@@ -220,12 +215,11 @@ def aggregate_contributions_all_time():
                         if author and author.get("login", "").lower() == LOGIN.lower():
                             r["additions"] = sum(w["a"] for w in item["weeks"])
                             r["deletions"] = sum(w["d"] for w in item["weeks"])
-                            log(f"  └ [Deep-Map] Fetched raw commit stats for my repo: {repo_name}")
                             break
-        except Exception as e:
+        except Exception:
             pass
 
-    log("All data processing complete.")
+    log("  └ All data processing complete.")
     return {"mine": mine, "others": others, "count_total": len(mine) + len(others)}
 
 # ---------- pretty formatting ----------
@@ -328,20 +322,33 @@ def main():
         log("🚀 Script initiated. Starting GitHub stats update process...")
         own_repos, total_stars = get_own_public_repos_and_total_stars()
         contrib = aggregate_contributions_all_time()
+        
+        log("▶ [5/5] Generating Markdown and replacing text (Safe String Split)...")
         block = render_markdown(own_repos, total_stars, contrib)
 
         with open("README.md", "r", encoding="utf-8") as f:
             content = f.read()
 
-        pattern = re.compile(r"()(.*?)()", re.S)
-        new = re.sub(pattern, r"\1\n" + block + r"\n\3", content)
+        # 彻底抛弃 re.sub()，使用绝对安全的字符串切割
+        start_marker = ""
+        end_marker = ""
+        
+        if start_marker in content and end_marker in content:
+            before = content.split(start_marker)[0]
+            after = content.split(end_marker, 1)[1]
+            new = before + start_marker + "\n" + block + "\n" + end_marker + after
+        else:
+            log("  [Warning] Tags not found! Appending to bottom of README.")
+            new = content + "\n\n" + start_marker + "\n" + block + "\n" + end_marker
 
+        log("  └ Writing back to README.md...")
         if new != content:
             with open("README.md", "w", encoding="utf-8") as f:
                 f.write(new)
-            log("\n✅ SUCCESS: README.md has been updated with new stats.")
+            log("\n✅ SUCCESS: README.md has been successfully updated with new stats!")
         else:
             log("\n✅ SUCCESS: No changes detected. README.md is already up to date.")
+            
     except Exception as e:
         log(f"\n❌ FATAL ERROR: {e}")
         sys.exit(1)
