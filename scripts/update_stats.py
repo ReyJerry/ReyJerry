@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os, sys, datetime
+import os, sys, datetime, time
 from dateutil.relativedelta import relativedelta
 import requests
 
@@ -205,16 +205,24 @@ def aggregate_contributions_all_time():
             
         url = f"https://api.github.com/repos/{repo_name}/stats/contributors"
         try:
-            resp = requests.get(url, headers=HEADERS, timeout=5)
-            if resp.status_code == 200:
-                data = resp.json()
-                if isinstance(data, list):
-                    for item in data:
-                        author = item.get("author")
-                        if author and author.get("login", "").lower() == LOGIN.lower():
-                            r["additions"] = sum(w["a"] for w in item["weeks"])
-                            r["deletions"] = sum(w["d"] for w in item["weeks"])
-                            break
+            # 加入安全的重试机制，专门解决自己仓库代码量为 0 的问题
+            for attempt in range(4):
+                resp = requests.get(url, headers=HEADERS, timeout=10)
+                if resp.status_code == 200:
+                    data = resp.json()
+                    if isinstance(data, list):
+                        for item in data:
+                            author = item.get("author")
+                            if author and author.get("login", "").lower() == LOGIN.lower():
+                                r["additions"] = sum(w["a"] for w in item["weeks"])
+                                r["deletions"] = sum(w["d"] for w in item["weeks"])
+                                break
+                    break
+                elif resp.status_code == 202:
+                    log(f"  [Wait] GitHub is caching {repo_name}, retrying...")
+                    time.sleep(2.5)  # 等待 GitHub 缓存计算
+                else:
+                    break
         except Exception:
             pass
 
@@ -246,7 +254,6 @@ def md_table_contrib(rows):
     if not rows:
         return "_(empty)_"
     
-    # 严格使用原版表头格式，仅插入 💻 Code 一列
     header = (
         "| Repository | 📝 Commits | 🔀 PRs | 🐛 Issues | 💻 Code | ∑ Total |\n"
         "|:--|--:|--:|--:|--:|--:|"
@@ -276,7 +283,6 @@ def md_list_own_stars(rows):
 # ---------- render blocks ----------
 
 def render_markdown(own_repos, total_stars, contrib):
-    # 完全复刻原版排版（保留了 <div align="left"> 和 <br/> 等使得页面渲染美观的标签）
     stars_block = f"""
 <details>
   <summary><b>⭐ Total Stars Earned:</b> <code>{to_k_plus(total_stars)}</code></summary>
@@ -321,7 +327,7 @@ def main():
         own_repos, total_stars = get_own_public_repos_and_total_stars()
         contrib = aggregate_contributions_all_time()
         
-        log("▶ [5/5] Generating Markdown and writing (Anti-Loop Version)...")
+        log("▶ [5/5] Generating Markdown and writing...")
         block = render_markdown(own_repos, total_stars, contrib)
 
         with open("README.md", "r", encoding="utf-8") as f:
@@ -330,10 +336,8 @@ def main():
         start_marker = ""
         end_marker = ""
         
-        # 终极安全切片：先找 START
         start_idx = content.find(start_marker)
         if start_idx != -1:
-            # 再从 START 的屁股后面去找 END，杜绝错位和倒序导致的指数爆炸
             search_start = start_idx + len(start_marker)
             end_idx = content.find(end_marker, search_start)
             
