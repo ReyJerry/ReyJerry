@@ -27,7 +27,7 @@ def gql(query, variables=None):
 def get_own_public_repos_and_total_stars():
     repos, total = [], 0
     cursor = None
-    log("▶ [1/5] Fetching own repositories and total stars...")
+    log("▶ [1/4] Fetching own repositories and total stars...")
     while True:
         q = """
         query($login:String!, $cursor:String) {
@@ -70,7 +70,7 @@ def get_years():
     return years
 
 def collect_by_year(year):
-    log(f"▶ [2/5] Collecting basic contributions for year {year}...")
+    log(f"▶ [2/4] Collecting basic contributions for year {year}...")
     start = datetime.datetime(year, 1, 1)
     end = datetime.datetime(year + 1, 1, 1) - relativedelta(seconds=1)
     q = """
@@ -119,7 +119,7 @@ def collect_by_year(year):
 def get_pr_lines():
     pr_stats = {}
     cursor = None
-    log("▶ [3/5] Fetching all Pull Request code lines via GraphQL...")
+    log("▶ [3/4] Fetching all Pull Request code lines via GraphQL...")
     try:
         while True:
             q = """
@@ -190,7 +190,7 @@ def aggregate_contributions_all_time():
 
     pr_lines = get_pr_lines()
 
-    log("▶ [4/5] Mapping Code Additions/Deletions...")
+    log("▶ [4/4] Mapping Code Additions/Deletions...")
     for r in others:
         repo_name = r["name"]
         if repo_name in pr_lines:
@@ -205,7 +205,6 @@ def aggregate_contributions_all_time():
             
         url = f"https://api.github.com/repos/{repo_name}/stats/contributors"
         try:
-            # 加入安全的重试机制，专门解决自己仓库代码量为 0 的问题
             for attempt in range(4):
                 resp = requests.get(url, headers=HEADERS, timeout=10)
                 if resp.status_code == 200:
@@ -220,7 +219,7 @@ def aggregate_contributions_all_time():
                     break
                 elif resp.status_code == 202:
                     log(f"  [Wait] GitHub is caching {repo_name}, retrying...")
-                    time.sleep(2.5)  # 等待 GitHub 缓存计算
+                    time.sleep(2.5)
                 else:
                     break
         except Exception:
@@ -280,8 +279,6 @@ def md_list_own_stars(rows):
     items = [f'- {repo_chip(r["name"], r["url"], r["stars"], r["forks"])}' for r in rows]
     return "\n".join(items)
 
-# ---------- render blocks ----------
-
 def render_markdown(own_repos, total_stars, contrib):
     stars_block = f"""
 <details>
@@ -327,43 +324,42 @@ def main():
         own_repos, total_stars = get_own_public_repos_and_total_stars()
         contrib = aggregate_contributions_all_time()
         
-        log("▶ [5/5] Generating Markdown and writing...")
-        block = render_markdown(own_repos, total_stars, contrib)
+        log("▶ [5/5] Generating Complete Overwrite for README...")
+        stats_block = render_markdown(own_repos, total_stars, contrib)
 
-        with open("README.md", "r", encoding="utf-8") as f:
-            content = f.read()
+        # 核心：将你的主页自我介绍直接写死在代码里！
+        # 脚本每次运行，都会生成一张完美的、全新的白纸，彻底干掉任何历史残留！
+        profile_template = """# Hi 👋, I'm ReyJerry
 
-        # 换用全新的“锁”，彻底无视之前被污染的标签
-        start_marker = ""
-        end_marker = ""
+### A passionate Natural Language Architecture researcher
+
+<p align="left"> <a href="https://github.com/ryo-ma/github-profile-trophy"><img src="https://github-profile-trophy.vercel.app/?username=ReyJerry" alt="ReyJerry" /></a> </p>
+
+- 🌱 I'm currently learning **Natural Language Architecture, Multimodal, and Graph Learning**
+
+- 📫 How to reach me **rli541@connect.hkust-gz.edu.cn**
+
+- 👨‍💻 All of my projects are available at **[https://reyjerry.github.io/](https://reyjerry.github.io/)**
+
+<h3 align="left">Connect with me:</h3>
+<p align="left">
+<a href="https://github.com/ReyJerry" target="blank"><img align="center" src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/github.svg" alt="ReyJerry" height="30" width="40" /></a>
+</p>
+
+<h3 align="left">Languages and Tools:</h3>
+<p align="left"> <a href="https://developer.mozilla.org/en-US/docs/Web/c" target="_blank" rel="noreferrer"> <img src="https://skillicons.dev/icons?i=c" alt="c" width="40" height="40"/> </a> <a href="https://developer.mozilla.org/en-US/docs/Web/java" target="_blank" rel="noreferrer"> <img src="https://skillicons.dev/icons?i=java" alt="java" width="40" height="40"/> </a> <a href="https://developer.mozilla.org/en-US/docs/Web/python" target="_blank" rel="noreferrer"> <img src="https://skillicons.dev/icons?i=py" alt="python" width="40" height="40"/> </a></p>
+
+## 📊 My Contribution Stats
+
+"""
         
-        start_idx = content.find(start_marker)
-        if start_idx != -1:
-            search_start = start_idx + len(start_marker)
-            end_idx = content.find(end_marker, search_start)
+        full_readme = profile_template + stats_block
+
+        log("  └ Overwriting README.md entirely...")
+        with open("README.md", "w", encoding="utf-8") as f:
+            f.write(full_readme)
             
-            if end_idx != -1:
-                before = content[:start_idx]
-                after = content[end_idx + len(end_marker):]
-                new = before + start_marker + "\n" + block + "\n" + end_marker + after
-            else:
-                log("  [Warning] END tag missing! Appending safely.")
-                new = content + "\n\n" + start_marker + "\n" + block + "\n" + end_marker
-        else:
-            log("  [Warning] START tag not found! Appending to bottom.")
-            new = content + "\n\n" + start_marker + "\n" + block + "\n" + end_marker
-
-        # 物理超度：把文件里残留的旧幽灵标签全部抹除
-        new = new.replace("", "")
-        new = new.replace("", "")
-
-        log("  └ Writing back to README.md...")
-        if new != content:
-            with open("README.md", "w", encoding="utf-8") as f:
-                f.write(new)
-            log("\n✅ SUCCESS: README.md has been safely updated!")
-        else:
-            log("\n✅ SUCCESS: No changes detected.")
+        log("\n✅ SUCCESS: README.md has been cleanly overwritten from scratch!")
             
     except Exception as e:
         log(f"\n❌ FATAL ERROR: {e}")
