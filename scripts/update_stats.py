@@ -11,6 +11,10 @@ TOKEN = os.environ.get("GITHUB_TOKEN", "").strip()
 API = "https://api.github.com/graphql"
 HEADERS = {"Authorization": f"bearer {TOKEN}"}
 
+# 强制实时刷新日志的函数，防止假死黑屏
+def log(msg):
+    print(msg, flush=True)
+
 def gql(query, variables=None):
     r = requests.post(API, headers=HEADERS, json={"query": query, "variables": variables or {}}, timeout=15)
     r.raise_for_status()
@@ -24,7 +28,7 @@ def gql(query, variables=None):
 def get_own_public_repos_and_total_stars():
     repos, total = [], 0
     cursor = None
-    print("Fetching own repositories and total stars...")
+    log("▶ [1/4] Fetching own repositories and total stars...")
     while True:
         q = """
         query($login:String!, $cursor:String) {
@@ -50,6 +54,7 @@ def get_own_public_repos_and_total_stars():
         else:
             break
     repos.sort(key=lambda x: (-x["stars"], -x["forks"]))
+    log(f"  └ Found {len(repos)} public repos. Stars: {total}")
     return repos, total
 
 def get_years():
@@ -67,7 +72,7 @@ def get_years():
     return years
 
 def collect_by_year(year):
-    print(f"Collecting basic contributions for year {year}...")
+    log(f"▶ [2/4] Collecting basic contributions for year {year}...")
     start = datetime.datetime(year, 1, 1)
     end = datetime.datetime(year + 1, 1, 1) - relativedelta(seconds=1)
     q = """
@@ -116,15 +121,17 @@ def collect_by_year(year):
 def get_pr_lines():
     pr_stats = {}
     cursor = None
-    print("Fetching GraphQL Pull Request code lines...")
+    log("▶ [3/4] Fetching all Pull Request code lines via GraphQL (Safe Mode)...")
     try:
         while True:
+            # 移除了状态过滤，采用全量拉取并在代码中进行过滤，避免 API 报错
             q = """
             query($login:String!, $cursor:String) {
               user(login:$login){
-                pullRequests(states: [MERGED], first: 100, after: $cursor){
+                pullRequests(first: 100, after: $cursor){
                   pageInfo { hasNextPage endCursor }
                   nodes {
+                    state
                     repository { nameWithOwner }
                     additions
                     deletions
@@ -135,18 +142,20 @@ def get_pr_lines():
             d = gql(q, {"login": LOGIN, "cursor": cursor})
             page = d["user"]["pullRequests"]
             for n in page["nodes"]:
-                repo = n["repository"]["nameWithOwner"]
-                if repo not in pr_stats:
-                    pr_stats[repo] = {"additions": 0, "deletions": 0}
-                pr_stats[repo]["additions"] += n["additions"]
-                pr_stats[repo]["deletions"] += n["deletions"]
+                if n.get("state") == "MERGED":
+                    repo = n["repository"]["nameWithOwner"]
+                    if repo not in pr_stats:
+                        pr_stats[repo] = {"additions": 0, "deletions": 0}
+                    pr_stats[repo]["additions"] += n["additions"]
+                    pr_stats[repo]["deletions"] += n["deletions"]
             
             if page["pageInfo"]["hasNextPage"]:
                 cursor = page["pageInfo"]["endCursor"]
             else:
                 break
+        log("  └ PR lines successfully mapped.")
     except Exception as e:
-        print(f"Warning: Fetching PR lines failed: {e}", file=sys.stderr)
+        log(f"  [ERROR] Fetching PR lines failed: {e}")
         
     return pr_stats
 
@@ -182,23 +191,20 @@ def aggregate_contributions_all_time():
     mine.sort(key=keyf)
     others.sort(key=keyf)
 
-    # 核心优化点：极速拉取策略
+    # Core Stats Assignment
     pr_lines = get_pr_lines()
 
-    print("\n--- Mapping Code Stats ---")
+    log("\n▶ [4/4] Mapping Code Additions/Deletions...")
     
-    # 1. 对于别人的仓库：直接使用瞬间拉取好的 PR 数据，防止在大仓库请求 REST API 卡死
     for r in others:
         repo_name = r["name"]
         if repo_name in pr_lines:
             r["additions"] = pr_lines[repo_name]["additions"]
             r["deletions"] = pr_lines[repo_name]["deletions"]
-            print(f" [Fast] Applied PR stats for other repo: {repo_name}")
+            log(f"  └ [Fast-Map] Linked PR stats for other repo: {repo_name}")
 
-    # 2. 对于你自己的仓库：因为比较小，直接请求 REST API 是秒回的，可以捕捉到你直接 Push 的代码量
     for r in mine:
         repo_name = r["name"]
-        # 先用 PR 数据保底
         if repo_name in pr_lines:
             r["additions"] = pr_lines[repo_name]["additions"]
             r["deletions"] = pr_lines[repo_name]["deletions"]
@@ -214,11 +220,12 @@ def aggregate_contributions_all_time():
                         if author and author.get("login", "").lower() == LOGIN.lower():
                             r["additions"] = sum(w["a"] for w in item["weeks"])
                             r["deletions"] = sum(w["d"] for w in item["weeks"])
-                            print(f" [Deep] Fetched commit stats for my repo: {repo_name}")
+                            log(f"  └ [Deep-Map] Fetched raw commit stats for my repo: {repo_name}")
                             break
         except Exception as e:
-            print(f" [Skip] API timeout for {repo_name}, using PR fallback.", file=sys.stderr)
+            pass
 
+    log("All data processing complete.")
     return {"mine": mine, "others": others, "count_total": len(mine) + len(others)}
 
 # ---------- pretty formatting ----------
@@ -317,26 +324,30 @@ def render_markdown(own_repos, total_stars, contrib):
 # ---------- main ----------
 
 def main():
-    print("🚀 Starting GitHub stats update process (Fast Mode)...")
-    own_repos, total_stars = get_own_public_repos_and_total_stars()
-    contrib = aggregate_contributions_all_time()
-    block = render_markdown(own_repos, total_stars, contrib)
+    try:
+        log("🚀 Script initiated. Starting GitHub stats update process...")
+        own_repos, total_stars = get_own_public_repos_and_total_stars()
+        contrib = aggregate_contributions_all_time()
+        block = render_markdown(own_repos, total_stars, contrib)
 
-    with open("README.md", "r", encoding="utf-8") as f:
-        content = f.read()
+        with open("README.md", "r", encoding="utf-8") as f:
+            content = f.read()
 
-    pattern = re.compile(r"()(.*?)()", re.S)
-    new = re.sub(pattern, r"\1\n" + block + r"\n\3", content)
+        pattern = re.compile(r"()(.*?)()", re.S)
+        new = re.sub(pattern, r"\1\n" + block + r"\n\3", content)
 
-    if new != content:
-        with open("README.md", "w", encoding="utf-8") as f:
-            f.write(new)
-        print("\n✅ SUCCESS: README.md has been updated with new stats.")
-    else:
-        print("\n✅ SUCCESS: No changes detected. README.md is already up to date.")
+        if new != content:
+            with open("README.md", "w", encoding="utf-8") as f:
+                f.write(new)
+            log("\n✅ SUCCESS: README.md has been updated with new stats.")
+        else:
+            log("\n✅ SUCCESS: No changes detected. README.md is already up to date.")
+    except Exception as e:
+        log(f"\n❌ FATAL ERROR: {e}")
+        sys.exit(1)
 
 if __name__ == "__main__":
     if not LOGIN or not TOKEN:
-        print("Missing GH_LOGIN or GITHUB_TOKEN.", file=sys.stderr)
+        log("❌ ERROR: Missing GH_LOGIN or GITHUB_TOKEN.")
         sys.exit(1)
     main()
