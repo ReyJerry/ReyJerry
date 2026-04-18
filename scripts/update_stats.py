@@ -333,6 +333,7 @@ def main():
         with open("README.md", "r", encoding="utf-8") as f:
             content = f.read()
 
+        # 换用全新的“锁”，彻底无视之前被污染的标签
         start_marker = ""
         end_marker = ""
         
@@ -351,6 +352,10 @@ def main():
         else:
             log("  [Warning] START tag not found! Appending to bottom.")
             new = content + "\n\n" + start_marker + "\n" + block + "\n" + end_marker
+
+        # 物理超度：把文件里残留的旧幽灵标签全部抹除
+        new = new.replace("", "")
+        new = new.replace("", "")
 
         log("  └ Writing back to README.md...")
         if new != content:
