@@ -11,7 +11,7 @@ TOKEN = os.environ.get("GITHUB_TOKEN", "").strip()
 API = "https://api.github.com/graphql"
 HEADERS = {"Authorization": f"bearer {TOKEN}"}
 
-# 强制实时刷新日志的函数
+# 强制实时刷新日志
 def log(msg):
     print(msg, flush=True)
 
@@ -181,7 +181,11 @@ def aggregate_contributions_all_time():
             "commit": v["commit"], "pr": v["pr"], "issue": v["issue"], "total": total,
             "additions": 0, "deletions": 0
         }
-        owner = name.split("/")[0].lower() if "/" in name else ""
+        
+        # 抛弃 split("/") 提取 owner，改用底层切片 find()
+        slash_idx = name.find("/")
+        owner = name[:slash_idx].lower() if slash_idx != -1 else ""
+        
         (mine if owner == LOGIN.lower() else others).append(row)
 
     keyf = lambda r: (-r["stars"], -r["forks"])
@@ -231,9 +235,14 @@ def to_k_plus(n: int) -> str:
     return str(n)
 
 def pretty_repo_text(full_name: str) -> str:
-    repo = full_name.split("/")[-1]
-    pretty = repo.replace("-", " ").replace("_", " ")
-    pretty = " ".join(w.capitalize() for w in pretty.split())
+    # 抛弃 split("/") 取名字，改用底层 rfind()
+    slash_idx = full_name.rfind("/")
+    repo = full_name[slash_idx+1:] if slash_idx != -1 else full_name
+    
+    repo = repo.replace("-", " ").replace("_", " ")
+    
+    # 无参数的 split() 是安全操作（根据空格切分），不会触发 empty separator
+    pretty = " ".join(w.capitalize() for w in repo.split())
     return pretty
 
 def repo_chip(name, url, stars, forks):
@@ -323,19 +332,22 @@ def main():
         own_repos, total_stars = get_own_public_repos_and_total_stars()
         contrib = aggregate_contributions_all_time()
         
-        log("▶ [5/5] Generating Markdown and replacing text (Safe String Split)...")
+        log("▶ [5/5] Generating Markdown and writing (Bulletproof Slicing)...")
         block = render_markdown(own_repos, total_stars, contrib)
 
         with open("README.md", "r", encoding="utf-8") as f:
             content = f.read()
 
-        # 彻底抛弃 re.sub()，使用绝对安全的字符串切割
         start_marker = ""
         end_marker = ""
         
-        if start_marker in content and end_marker in content:
-            before = content.split(start_marker)[0]
-            after = content.split(end_marker, 1)[1]
+        # 彻底抛弃 split()，使用绝对安全的底层索引查找和字符串切片
+        start_idx = content.find(start_marker)
+        end_idx = content.find(end_marker)
+        
+        if start_idx != -1 and end_idx != -1:
+            before = content[:start_idx]
+            after = content[end_idx + len(end_marker):]
             new = before + start_marker + "\n" + block + "\n" + end_marker + after
         else:
             log("  [Warning] Tags not found! Appending to bottom of README.")
