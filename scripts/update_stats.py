@@ -321,7 +321,7 @@ def main():
         own_repos, total_stars = get_own_public_repos_and_total_stars()
         contrib = aggregate_contributions_all_time()
         
-        log("▶ [5/5] Generating Markdown and writing...")
+        log("▶ [5/5] Generating Markdown and writing (Anti-Loop Version)...")
         block = render_markdown(own_repos, total_stars, contrib)
 
         with open("README.md", "r", encoding="utf-8") as f:
@@ -330,24 +330,31 @@ def main():
         start_marker = ""
         end_marker = ""
         
+        # 终极安全切片：先找 START
         start_idx = content.find(start_marker)
-        end_idx = content.find(end_marker)
-        
-        if start_idx != -1 and end_idx != -1:
-            before = content[:start_idx]
-            after = content[end_idx + len(end_marker):]
-            new = before + start_marker + "\n" + block + "\n" + end_marker + after
+        if start_idx != -1:
+            # 再从 START 的屁股后面去找 END，杜绝错位和倒序导致的指数爆炸
+            search_start = start_idx + len(start_marker)
+            end_idx = content.find(end_marker, search_start)
+            
+            if end_idx != -1:
+                before = content[:start_idx]
+                after = content[end_idx + len(end_marker):]
+                new = before + start_marker + "\n" + block + "\n" + end_marker + after
+            else:
+                log("  [Warning] END tag missing! Appending safely.")
+                new = content + "\n\n" + start_marker + "\n" + block + "\n" + end_marker
         else:
-            log("  [Warning] Tags not found! Appending to bottom of README.")
+            log("  [Warning] START tag not found! Appending to bottom.")
             new = content + "\n\n" + start_marker + "\n" + block + "\n" + end_marker
 
         log("  └ Writing back to README.md...")
         if new != content:
             with open("README.md", "w", encoding="utf-8") as f:
                 f.write(new)
-            log("\n✅ SUCCESS: README.md has been successfully updated with new stats!")
+            log("\n✅ SUCCESS: README.md has been safely updated!")
         else:
-            log("\n✅ SUCCESS: No changes detected. README.md is already up to date.")
+            log("\n✅ SUCCESS: No changes detected.")
             
     except Exception as e:
         log(f"\n❌ FATAL ERROR: {e}")
