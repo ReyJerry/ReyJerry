@@ -11,7 +11,6 @@ TOKEN = os.environ.get("GITHUB_TOKEN", "").strip()
 API = "https://api.github.com/graphql"
 HEADERS = {"Authorization": f"bearer {TOKEN}"}
 
-# 强制实时刷新日志
 def log(msg):
     print(msg, flush=True)
 
@@ -181,11 +180,8 @@ def aggregate_contributions_all_time():
             "commit": v["commit"], "pr": v["pr"], "issue": v["issue"], "total": total,
             "additions": 0, "deletions": 0
         }
-        
-        # 抛弃 split("/") 提取 owner，改用底层切片 find()
         slash_idx = name.find("/")
         owner = name[:slash_idx].lower() if slash_idx != -1 else ""
-        
         (mine if owner == LOGIN.lower() else others).append(row)
 
     keyf = lambda r: (-r["stars"], -r["forks"])
@@ -195,7 +191,6 @@ def aggregate_contributions_all_time():
     pr_lines = get_pr_lines()
 
     log("▶ [4/5] Mapping Code Additions/Deletions...")
-    
     for r in others:
         repo_name = r["name"]
         if repo_name in pr_lines:
@@ -235,13 +230,9 @@ def to_k_plus(n: int) -> str:
     return str(n)
 
 def pretty_repo_text(full_name: str) -> str:
-    # 抛弃 split("/") 取名字，改用底层 rfind()
     slash_idx = full_name.rfind("/")
     repo = full_name[slash_idx+1:] if slash_idx != -1 else full_name
-    
     repo = repo.replace("-", " ").replace("_", " ")
-    
-    # 无参数的 split() 是安全操作（根据空格切分），不会触发 empty separator
     pretty = " ".join(w.capitalize() for w in repo.split())
     return pretty
 
@@ -257,15 +248,16 @@ def md_table_contrib(rows):
     
     header = (
         "| Repository | 📝 Commits | 🔀 PRs | 🐛 Issues | 💻 Code | ∑ Total |\n"
-        "| :--- | ---: | ---: | ---: | ---: | ---: |"
+        "|:---|---:|---:|---:|---:|---:|"
     )
     lines = []
     for r in rows:
         adds = r.get("additions", 0)
         dels = r.get("deletions", 0)
         
+        # 抛弃单杠 "-"，避免 GitHub 表格解析引擎误认为是行内分割线
         if adds == 0 and dels == 0:
-            code_str = "-"
+            code_str = "0"
         else:
             code_str = f"+{adds} / -{dels}"
             
@@ -284,45 +276,31 @@ def md_list_own_stars(rows):
 # ---------- render blocks ----------
 
 def render_markdown(own_repos, total_stars, contrib):
+    # 彻底移除会诱发崩溃的 <div align="left"> 和 <br/> 标签，回归安全的原生 Markdown 排版
     stars_block = f"""
 <details>
-  <summary><b>⭐ Total Stars Earned:</b> <code>{to_k_plus(total_stars)}</code></summary>
+<summary><b>⭐ Total Stars Earned:</b> <code>{to_k_plus(total_stars)}</code></summary>
 
-  <br/>
 {md_list_own_stars(own_repos)}
 </details>
 """.strip()
 
     contrib_block = f"""
 <details>
-  <summary><b>🤝 Contributed to:</b> <code>{contrib["count_total"]}</code></summary>
+<summary><b>🤝 Contributed to:</b> <code>{contrib["count_total"]}</code></summary>
 
-  <br/>
-
-  <div><b>👥 Other Repos</b></div>
+**👥 Other Repos**
 
 {md_table_contrib(contrib["others"])}
 
-  <br/><br/>
-
-  <div><b>📦 My Repos</b></div>
+**📦 My Repos**
 
 {md_table_contrib(contrib["mine"])}
 
 </details>
 """.strip()
 
-    return f"""
-<div align="left">
-
-{stars_block}
-
-<br/>
-
-{contrib_block}
-
-</div>
-""".strip()
+    return f"{stars_block}\n\n{contrib_block}"
 
 # ---------- main ----------
 
@@ -332,7 +310,7 @@ def main():
         own_repos, total_stars = get_own_public_repos_and_total_stars()
         contrib = aggregate_contributions_all_time()
         
-        log("▶ [5/5] Generating Markdown and writing (Bulletproof Slicing)...")
+        log("▶ [5/5] Generating Markdown and writing...")
         block = render_markdown(own_repos, total_stars, contrib)
 
         with open("README.md", "r", encoding="utf-8") as f:
@@ -341,7 +319,6 @@ def main():
         start_marker = ""
         end_marker = ""
         
-        # 彻底抛弃 split()，使用绝对安全的底层索引查找和字符串切片
         start_idx = content.find(start_marker)
         end_idx = content.find(end_marker)
         
