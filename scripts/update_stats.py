@@ -12,7 +12,7 @@ API = "https://api.github.com/graphql"
 HEADERS = {"Authorization": f"bearer {TOKEN}"}
 
 def gql(query, variables=None):
-    r = requests.post(API, headers=HEADERS, json={"query": query, "variables": variables or {}})
+    r = requests.post(API, headers=HEADERS, json={"query": query, "variables": variables or {}}, timeout=15)
     r.raise_for_status()
     data = r.json()
     if "errors" in data:
@@ -22,9 +22,9 @@ def gql(query, variables=None):
 # ---------- data fetch ----------
 
 def get_own_public_repos_and_total_stars():
-    """own public (non-fork) repos + total stars, sorted by stars -> forks"""
     repos, total = [], 0
     cursor = None
+    print("Fetching own repositories and total stars...")
     while True:
         q = """
         query($login:String!, $cursor:String) {
@@ -67,6 +67,7 @@ def get_years():
     return years
 
 def collect_by_year(year):
+    print(f"Collecting basic contributions for year {year}...")
     start = datetime.datetime(year, 1, 1)
     end = datetime.datetime(year + 1, 1, 1) - relativedelta(seconds=1)
     q = """
@@ -113,9 +114,9 @@ def collect_by_year(year):
     return repo_map
 
 def get_pr_lines():
-    """Fallback: Get additions and deletions from user's merged PRs"""
     pr_stats = {}
     cursor = None
+    print("Fetching fallback PR code lines data...")
     try:
         while True:
             q = """
@@ -184,15 +185,17 @@ def aggregate_contributions_all_time():
     # Fetch Code Lines Data
     pr_lines = get_pr_lines()
 
-    def fetch_lines(repos):
+    def fetch_lines(repos, category_name):
+        print(f"\n--- Fetching Deep Code Stats for {category_name} Repos ---")
         for r in repos:
             repo_name = r["name"]
+            print(f" > Requesting stats for {repo_name}...")
             url = f"https://api.github.com/repos/{repo_name}/stats/contributors"
             found_in_rest = False
             
             try:
-                for _ in range(3):
-                    resp = requests.get(url, headers=HEADERS)
+                for attempt in range(3):
+                    resp = requests.get(url, headers=HEADERS, timeout=10)
                     if resp.status_code == 200:
                         data = resp.json()
                         if isinstance(data, list):
@@ -203,22 +206,27 @@ def aggregate_contributions_all_time():
                                     r["deletions"] = sum(w["d"] for w in item["weeks"])
                                     found_in_rest = True
                                     break
+                        print(f"   [OK] Found data for {repo_name}")
                         break
                     elif resp.status_code == 202:
+                        print(f"   [Wait] GitHub is caching {repo_name}, retrying in 2s (attempt {attempt+1}/3)...")
                         time.sleep(2)
                     else:
+                        print(f"   [Skip] API returned {resp.status_code} for {repo_name}")
                         break
             except Exception as e:
-                print(f"Warning: Fetching REST API stats failed for {repo_name}: {e}", file=sys.stderr)
+                print(f"   [Error] REST API failed for {repo_name}: {e}", file=sys.stderr)
             
             if not found_in_rest or (r["additions"] == 0 and r["deletions"] == 0):
                 if repo_name in pr_lines:
                     r["additions"] = pr_lines[repo_name]["additions"]
                     r["deletions"] = pr_lines[repo_name]["deletions"]
+                    print(f"   [Fallback] Used PR data for {repo_name}")
 
-    fetch_lines(mine)
-    fetch_lines(others)
+    fetch_lines(mine, "My")
+    fetch_lines(others, "Other")
 
+    print("\nAll data successfully fetched!")
     return {"mine": mine, "others": others, "count_total": len(mine) + len(others)}
 
 # ---------- pretty formatting ----------
@@ -231,16 +239,12 @@ def to_k_plus(n: int) -> str:
     return str(n)
 
 def pretty_repo_text(full_name: str) -> str:
-    """
-    'owner/repo-name_x' -> 'Repo Name X' (title-cased), but keep URL link text only.
-    """
     repo = full_name.split("/")[-1]
     pretty = repo.replace("-", " ").replace("_", " ")
     pretty = " ".join(w.capitalize() for w in pretty.split())
     return pretty
 
 def repo_chip(name, url, stars, forks):
-    """Repository link with inline star/fork chips, and 🔥 for 1k+ stars."""
     star_text = to_k_plus(stars)
     fire = " 🔥" if stars >= 1000 else ""
     pretty = pretty_repo_text(name)
@@ -250,7 +254,6 @@ def md_table_contrib(rows):
     if not rows:
         return "_(empty)_"
     
-    # 严格对齐Markdown表格格式，去掉了可能导致解析问题的括号
     header = (
         "| Repository | 📝 Commits | 🔀 PRs | 🐛 Issues | 💻 Code | ∑ Total |\n"
         "| :--- | ---: | ---: | ---: | ---: | ---: |"
@@ -323,6 +326,7 @@ def render_markdown(own_repos, total_stars, contrib):
 # ---------- main ----------
 
 def main():
+    print("Starting GitHub stats update process...")
     own_repos, total_stars = get_own_public_repos_and_total_stars()
     contrib = aggregate_contributions_all_time()
     block = render_markdown(own_repos, total_stars, contrib)
@@ -330,16 +334,15 @@ def main():
     with open("README.md", "r", encoding="utf-8") as f:
         content = f.read()
 
-    # 替换 README 内容
     pattern = re.compile(r"()(.*?)()", re.S)
     new = re.sub(pattern, r"\1\n" + block + r"\n\3", content)
 
     if new != content:
         with open("README.md", "w", encoding="utf-8") as f:
             f.write(new)
-        print("README updated.")
+        print("\nSUCCESS: README.md has been updated with new stats.")
     else:
-        print("No changes.")
+        print("\nSUCCESS: No changes detected. README.md is already up to date.")
 
 if __name__ == "__main__":
     if not LOGIN or not TOKEN:
