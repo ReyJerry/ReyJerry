@@ -53,8 +53,8 @@
 | Repository | 📝 Commits | 🔀 PRs | 🐛 Issues | 💻 Code | ∑ Total |
 |:--|--:|--:|--:|--:|--:|
 | <a href="https://github.com/ReyJerry/Triton-MoBA">Triton Moba</a> <sub>· ⭐ 3 · 🍴 0</sub> | `1` | `0` | `0` | `-` | **`1`** |
-| <a href="https://github.com/ReyJerry/HydraNet">Hydranet</a> <sub>· ⭐ 1 · 🍴 0</sub> | `18` | `0` | `0` | `+10122 / -5804` | **`18`** |
-| <a href="https://github.com/ReyJerry/ReyJerry.github.io">Reyjerry.github.io</a> <sub>· ⭐ 0 · 🍴 0</sub> | `460` | `0` | `0` | `-` | **`460`** |
+| <a href="https://github.com/ReyJerry/HydraNet">Hydranet</a> <sub>· ⭐ 1 · 🍴 0</sub> | `18` | `0` | `0` | `-` | **`18`** |
+| <a href="https://github.com/ReyJerry/ReyJerry.github.io">Reyjerry.github.io</a> <sub>· ⭐ 0 · 🍴 0</sub> | `461` | `0` | `0` | `-` | **`461`** |
 | <a href="https://github.com/ReyJerry/ReyJerry">Reyjerry</a> <sub>· ⭐ 0 · 🍴 0</sub> | `37` | `0` | `0` | `-` | **`37`** |
 | <a href="https://github.com/ReyJerry/flaa">Flaa</a> <sub>· ⭐ 0 · 🍴 0</sub> | `16` | `0` | `0` | `-` | **`16`** |
 | <a href="https://github.com/ReyJerry/Playlist-Understands-You">Playlist Understands You</a> <sub>· ⭐ 0 · 🍴 0</sub> | `2` | `0` | `0` | `-` | **`2`** |
