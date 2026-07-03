@@ -55,7 +55,7 @@
 | <a href="https://github.com/ReyJerry/Triton-MoBA">Triton Moba</a> <sub>· ⭐ 3 · 🍴 0</sub> | `1` | `0` | `0` | `+2027 / -0` | **`1`** |
 | <a href="https://github.com/ReyJerry/HydraNet">Hydranet</a> <sub>· ⭐ 1 · 🍴 0</sub> | `18` | `0` | `0` | `+10122 / -5804` | **`18`** |
 | <a href="https://github.com/ReyJerry/ReyJerry.github.io">Reyjerry.github.io</a> <sub>· ⭐ 0 · 🍴 0</sub> | `474` | `0` | `0` | `+40273 / -17188` | **`474`** |
-| <a href="https://github.com/ReyJerry/ReyJerry">Reyjerry</a> <sub>· ⭐ 0 · 🍴 0</sub> | `37` | `0` | `0` | `-` | **`37`** |
+| <a href="https://github.com/ReyJerry/ReyJerry">Reyjerry</a> <sub>· ⭐ 0 · 🍴 0</sub> | `37` | `0` | `0` | `+1055 / -321999` | **`37`** |
 | <a href="https://github.com/ReyJerry/flaa">Flaa</a> <sub>· ⭐ 0 · 🍴 0</sub> | `16` | `0` | `0` | `-` | **`16`** |
 | <a href="https://github.com/ReyJerry/GeoHarness">Geoharness</a> <sub>· ⭐ 0 · 🍴 0</sub> | `1` | `0` | `0` | `-` | **`1`** |
 
