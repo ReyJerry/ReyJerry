@@ -23,10 +23,10 @@
 <div align="left">
 
 <details>
-  <summary><b>⭐ Total Stars Earned:</b> <code>4</code></summary>
+  <summary><b>⭐ Total Stars Earned:</b> <code>5</code></summary>
 
   <br/>
-- <a href="https://github.com/ReyJerry/Triton-MoBA">Triton Moba</a> <sub>· ⭐ 3 · 🍴 0</sub>
+- <a href="https://github.com/ReyJerry/Triton-MoBA">Triton Moba</a> <sub>· ⭐ 4 · 🍴 0</sub>
 - <a href="https://github.com/ReyJerry/HydraNet">Hydranet</a> <sub>· ⭐ 1 · 🍴 0</sub>
 - <a href="https://github.com/ReyJerry/ReyJerry.github.io">Reyjerry.github.io</a> <sub>· ⭐ 0 · 🍴 0</sub>
 - <a href="https://github.com/ReyJerry/ReyJerry">Reyjerry</a> <sub>· ⭐ 0 · 🍴 0</sub>
@@ -43,7 +43,7 @@
 
 | Repository | 📝 Commits | 🔀 PRs | 🐛 Issues | 💻 Code | ∑ Total |
 |:--|--:|--:|--:|--:|--:|
-| <a href="https://github.com/fla-org/flash-linear-attention">Flash Linear Attention</a> <sub>· ⭐ 5.3k+ 🔥 · 🍴 569</sub> | `2` | `3` | `2` | `+700 / -5` | **`7`** |
+| <a href="https://github.com/fla-org/flash-linear-attention">Flash Linear Attention</a> <sub>· ⭐ 5.3k+ 🔥 · 🍴 571</sub> | `2` | `3` | `2` | `+700 / -5` | **`7`** |
 | <a href="https://github.com/MoonshotAI/MoBA">Moba</a> <sub>· ⭐ 2.1k+ 🔥 · 🍴 153</sub> | `0` | `1` | `0` | `-` | **`1`** |
 | <a href="https://github.com/mit-han-lab/flash-moba">Flash Moba</a> <sub>· ⭐ 249 · 🍴 10</sub> | `2` | `1` | `1` | `+22 / -18` | **`4`** |
 
@@ -52,7 +52,7 @@
 
 | Repository | 📝 Commits | 🔀 PRs | 🐛 Issues | 💻 Code | ∑ Total |
 |:--|--:|--:|--:|--:|--:|
-| <a href="https://github.com/ReyJerry/Triton-MoBA">Triton Moba</a> <sub>· ⭐ 3 · 🍴 0</sub> | `1` | `0` | `0` | `+2027 / -0` | **`1`** |
+| <a href="https://github.com/ReyJerry/Triton-MoBA">Triton Moba</a> <sub>· ⭐ 4 · 🍴 0</sub> | `1` | `0` | `0` | `+2027 / -0` | **`1`** |
 | <a href="https://github.com/ReyJerry/HydraNet">Hydranet</a> <sub>· ⭐ 1 · 🍴 0</sub> | `18` | `0` | `0` | `+10122 / -5804` | **`18`** |
 | <a href="https://github.com/ReyJerry/ReyJerry.github.io">Reyjerry.github.io</a> <sub>· ⭐ 0 · 🍴 0</sub> | `475` | `0` | `0` | `+40274 / -17189` | **`475`** |
 | <a href="https://github.com/ReyJerry/ReyJerry">Reyjerry</a> <sub>· ⭐ 0 · 🍴 0</sub> | `37` | `0` | `0` | `+1055 / -321999` | **`37`** |
