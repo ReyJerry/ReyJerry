@@ -43,7 +43,7 @@
 
 | Repository | 📝 Commits | 🔀 PRs | 🐛 Issues | 💻 Code | ∑ Total |
 |:--|--:|--:|--:|--:|--:|
-| <a href="https://github.com/fla-org/flash-linear-attention">Flash Linear Attention</a> <sub>· ⭐ 5.3k+ 🔥 · 🍴 579</sub> | `2` | `3` | `2` | `+700 / -5` | **`7`** |
+| <a href="https://github.com/fla-org/flash-linear-attention">Flash Linear Attention</a> <sub>· ⭐ 5.3k+ 🔥 · 🍴 582</sub> | `2` | `3` | `2` | `+700 / -5` | **`7`** |
 | <a href="https://github.com/MoonshotAI/MoBA">Moba</a> <sub>· ⭐ 2.1k+ 🔥 · 🍴 154</sub> | `0` | `1` | `0` | `-` | **`1`** |
 | <a href="https://github.com/mit-han-lab/flash-moba">Flash Moba</a> <sub>· ⭐ 250 · 🍴 10</sub> | `2` | `1` | `1` | `+22 / -18` | **`4`** |
 
