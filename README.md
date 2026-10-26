@@ -43,7 +43,7 @@
 
 | Repository | 📝 Commits | 🔀 PRs | 🐛 Issues | 💻 Code | ∑ Total |
 |:--|--:|--:|--:|--:|--:|
-| <a href="https://github.com/fla-org/flash-linear-attention">Flash Linear Attention</a> <sub>· ⭐ 6k+ 🔥 · 🍴 783</sub> | `4` | `6` | `2` | `+700 / -5` | **`12`** |
+| <a href="https://github.com/fla-org/flash-linear-attention">Flash Linear Attention</a> <sub>· ⭐ 6k+ 🔥 · 🍴 786</sub> | `4` | `6` | `2` | `+700 / -5` | **`12`** |
 | <a href="https://github.com/MoonshotAI/MoBA">Moba</a> <sub>· ⭐ 2.2k+ 🔥 · 🍴 161</sub> | `0` | `1` | `0` | `-` | **`1`** |
 | <a href="https://github.com/mit-han-lab/flash-moba">Flash Moba</a> <sub>· ⭐ 255 · 🍴 10</sub> | `2` | `1` | `1` | `+22 / -18` | **`4`** |
 
@@ -58,7 +58,7 @@
 | <a href="https://github.com/ReyJerry/ReyJerry">Reyjerry</a> <sub>· ⭐ 0 · 🍴 0</sub> | `37` | `0` | `0` | `+1055 / -321999` | **`37`** |
 | <a href="https://github.com/ReyJerry/flaa">Flaa</a> <sub>· ⭐ 0 · 🍴 0</sub> | `16` | `0` | `0` | `-` | **`16`** |
 | <a href="https://github.com/ReyJerry/GeoHarness">Geoharness</a> <sub>· ⭐ 0 · 🍴 0</sub> | `1` | `0` | `0` | `-` | **`1`** |
-| <a href="https://github.com/ReyJerry/flash-linear-attention">Flash Linear Attention</a> <sub>· ⭐ 0 · 🍴 0</sub> | `0` | `1` | `0` | `-` | **`1`** |
+| <a href="https://github.com/ReyJerry/flash-linear-attention">Flash Linear Attention</a> <sub>· ⭐ 0 · 🍴 0</sub> | `0` | `2` | `0` | `+700 / -5` | **`2`** |
 
 </details>
 
